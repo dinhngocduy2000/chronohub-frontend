@@ -1,0 +1,6 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+  "app_name": "ChronoHub",
+  "welcome": "Welcome to ChronoHub",
+  "footer_copyright": "All rights reserved."
+}
