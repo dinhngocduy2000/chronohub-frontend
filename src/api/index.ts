@@ -1,40 +1,100 @@
-import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import axios, { type AxiosResponse, HttpStatusCode } from 'axios'
+import { ENV_CONFIGS } from '@/lib/env-const'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
-
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 30_000,
+const axiosConfig = axios.create({
+  baseURL: `${ENV_CONFIGS.VITE_API_ENDPOINT}`,
   headers: {
     'Content-Type': 'application/json',
   },
 })
+// Add a request interceptor
+axiosConfig.interceptors.request.use(
+  (config) => {
+    // const accessToken = localStorage.getItem(KEY_STORAGE.ACCESS_TOKEN)
+    // if (accessToken) {
+    //   config.headers['Authorization'] = `Bearer ${accessToken}`
+    //   config.headers['Accept-Language'] = getCurrentLanguage()
+    // }
 
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('accessToken')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
+    // // Do something before request is sent
     return config
   },
-  (error: AxiosError) => Promise.reject(error),
+  (error) =>
+    // Do something with request error
+    Promise.reject(error),
 )
-
-apiClient.interceptors.response.use(
+// Add a response interceptor
+axiosConfig.interceptors.response.use(
   (response: AxiosResponse) => response.data,
-  (error: AxiosError) => {
-    if (error.response) {
-      const { status } = error.response
+  async (error) => {
+    if (!error.response) {
+      return Promise.reject(error)
+    }
+    switch (error.response.status) {
+      case HttpStatusCode.Forbidden:
+        // handleLogout()
+        break
+      case HttpStatusCode.NotFound:
+        break
+      case HttpStatusCode.Unauthorized:
+        return
 
-      if (status === 401) {
-        localStorage.removeItem('accessToken')
-        window.location.href = '/login'
-      }
+      case HttpStatusCode.InternalServerError:
+        break
+      default:
+        break
     }
 
     return Promise.reject(error)
   },
 )
 
-export default apiClient
+export const axiosConfigWithoutAuth = axios.create({
+  baseURL: ENV_CONFIGS.VITE_API_ENDPOINT as string,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// Add a response interceptor
+axiosConfigWithoutAuth.interceptors.response.use(
+  (response: AxiosResponse) => response.data,
+  async (error) => {
+    if (!error.response) {
+      return Promise.reject(error)
+    }
+    return Promise.reject(error)
+  },
+)
+
+// const renewToken = async () => {
+//   // TODO: refresh token function here
+//   try {
+//     const refreshToken = localStorage.getItem(KEY_STORAGE.REFRESH_TOKEN)
+//     if (!refreshToken) {
+//       handleLogout()
+//       return
+//     }
+//     const response = await refreshTokenAPI({ refreshToken })
+//     localStorage.setItem(KEY_STORAGE.ACCESS_TOKEN, response.data.accessToken)
+//     localStorage.setItem(KEY_STORAGE.REFRESH_TOKEN, response.data.refreshToken)
+//     return response.data.accessToken
+//   } catch {
+//     handleLogout()
+//   }
+// }
+
+// const handleRenewToken = async (error: unknown) => {
+//   if (!(error instanceof AxiosError)) {
+//     return
+//   }
+//   const originalRequest = error.config
+//   if (!originalRequest) {
+//     return
+//   }
+//   const newAccessToken = await renewToken()
+//   originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
+//   return await axiosConfig(originalRequest)
+// }
+
+export default axiosConfig

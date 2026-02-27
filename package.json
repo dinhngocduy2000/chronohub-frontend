@@ -14,7 +14,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "cursor:sync": "node scripts/generate-cursor-rules.js"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
