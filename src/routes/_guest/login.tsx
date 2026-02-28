@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { TypographyMuted, TypographyP } from '@/components/ui/typography'
-import type { IResponseData } from '@/interface/api-response'
 import type { ILoginFormType } from '@/interface/auth'
 import { getTranslations } from '@/lib/translation'
 import { loginFormSchemas } from '@/schemas/auth-schemas'
@@ -56,14 +55,17 @@ function LoginPage() {
     mutateAsync({ email: data.email, password: data.password, rememberMe: data.rememberMe })
   }
 
-  const serverError = error as AxiosError<IResponseData<null>> | null
-
+  const serverError = error as AxiosError<{ detail: string }> | null
   return (
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">{translation.login_title()}</CardTitle>
-          <CardDescription>{translation.login_description()}</CardDescription>
+          <CardTitle data-testid="login_title" className="text-2xl">
+            {translation.login_title()}
+          </CardTitle>
+          <CardDescription data-testid="login_description">
+            {translation.login_description()}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -73,9 +75,10 @@ function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{translation.login_email_label()}</FormLabel>
+                    <FormLabel data-testid="email">{translation.login_email_label()}</FormLabel>
                     <FormControl>
                       <Input
+                        data-testid="email-input"
                         type="email"
                         placeholder={translation.login_email_placeholder()}
                         {...field}
@@ -91,10 +94,13 @@ function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{translation.login_password_label()}</FormLabel>
+                    <FormLabel data-testid="password">
+                      {translation.login_password_label()}
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
+                          data-testid="password-input"
                           type={showPassword ? 'text' : 'password'}
                           placeholder={translation.login_password_placeholder()}
                           className="pr-10"
@@ -138,11 +144,16 @@ function LoginPage() {
 
               {serverError && (
                 <TypographyP className="mt-0! text-sm text-destructive">
-                  {serverError?.response?.data?.message || translation.login_failed()}
+                  {serverError?.response?.data?.detail || translation.login_failed()}
                 </TypographyP>
               )}
 
-              <Button type="submit" className="w-full" disabled={isPending || !isValid}>
+              <Button
+                type="submit"
+                data-testid="login-button"
+                className="w-full"
+                disabled={isPending || !isValid}
+              >
                 {isPending && <Loader2 className="animate-spin" />}
                 {translation.login_submit()}
               </Button>
