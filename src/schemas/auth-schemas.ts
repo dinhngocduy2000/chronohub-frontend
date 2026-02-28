@@ -16,6 +16,15 @@ export const passwordSchemas = z.object({
   password: z.preprocess(toTrimmedString, z.string().min(1, { message: 'Password is required' })),
 })
 
+export const loginFormSchemas = z.object({
+  email: z
+    .string()
+    .min(1, { message: 'Email is required' })
+    .email({ message: 'Invalid email format' }),
+  password: z.string().min(1, { message: 'Password is required' }),
+  rememberMe: z.boolean().default(false),
+})
+
 export const otpSchemas = z.object({
   otp: z.preprocess(
     toTrimmedString,

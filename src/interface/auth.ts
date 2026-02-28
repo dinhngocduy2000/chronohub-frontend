@@ -1,12 +1,19 @@
 import type z from 'zod'
-import type { emailSchemas, otpSchemas, passwordSchemas } from '@/schemas/auth-schemas'
+import type {
+  emailSchemas,
+  loginFormSchemas,
+  otpSchemas,
+  passwordSchemas,
+} from '@/schemas/auth-schemas'
 
 export type IEmailFormType = z.infer<typeof emailSchemas>
 export type IPasswordFormType = z.infer<typeof passwordSchemas>
 export type IOTPFormType = z.infer<typeof otpSchemas>
+export type ILoginFormType = z.infer<typeof loginFormSchemas>
 
 export type ILoginRequest = {
-  username: string
+  email: string
+  rememberMe?: boolean
 } & Partial<IPasswordFormType> &
   Partial<IOTPFormType>
 

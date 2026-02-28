@@ -1,17 +1,13 @@
 import type { ReactNode } from 'react'
-import { Footer } from './Footer'
-import { Header } from './Header'
 
-interface MainLayoutProps {
+interface GuestLayoutProps {
   children: ReactNode
 }
 
-export function MainLayout({ children }: MainLayoutProps) {
+export function GuestLayout({ children }: GuestLayoutProps) {
   return (
     <div className="relative flex min-h-screen flex-col bg-background text-foreground">
-      <Header />
       <main className="flex-1">{children}</main>
-      <Footer />
     </div>
   )
 }

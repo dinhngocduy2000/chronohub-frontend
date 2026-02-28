@@ -1,0 +1,182 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import type { AxiosError } from 'axios'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useState } from 'react'
+import { type Resolver, useForm } from 'react-hook-form'
+import { loginApi } from '@/api/auth'
+import { GoogleIcon } from '@/assets/google-icon'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { TypographyMuted, TypographyP } from '@/components/ui/typography'
+import type { ILoginFormType } from '@/interface/auth'
+import { getTranslations } from '@/lib/translation'
+import { loginFormSchemas } from '@/schemas/auth-schemas'
+
+export const Route = createFileRoute('/_guest/login')({ component: LoginPage })
+
+function LoginPage() {
+  const translation = getTranslations()
+  const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+
+  const form = useForm<ILoginFormType>({
+    mode: 'onChange',
+    resolver: zodResolver(loginFormSchemas as never) as Resolver<ILoginFormType>,
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  })
+  const {
+    formState: { isValid },
+  } = form
+
+  const { mutateAsync, isPending, error } = useMutation({
+    mutationFn: loginApi,
+    onSuccess: () => {
+      navigate({ to: '/' })
+    },
+  })
+
+  const onSubmit = (data: ILoginFormType) => {
+    mutateAsync({ email: data.email, password: data.password, rememberMe: data.rememberMe })
+  }
+
+  const serverError = error as AxiosError<{ detail: string }> | null
+  return (
+    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle data-testid="login_title" className="text-2xl">
+            {translation.login_title()}
+          </CardTitle>
+          <CardDescription data-testid="login_description">
+            {translation.login_description()}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel data-testid="email">{translation.login_email_label()}</FormLabel>
+                    <FormControl>
+                      <Input
+                        data-testid="email-input"
+                        type="email"
+                        placeholder={translation.login_email_placeholder()}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel data-testid="password">
+                      {translation.login_password_label()}
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          data-testid="password-input"
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder={translation.login_password_placeholder()}
+                          className="pr-10"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-xs"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          tabIndex={-1}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="size-4" />
+                          ) : (
+                            <Eye className="size-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="rememberMe"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-2 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="cursor-pointer font-normal">
+                      {translation.login_remember_me()}
+                    </FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              {serverError && (
+                <TypographyP className="mt-0! text-sm text-destructive">
+                  {serverError?.response?.data?.detail || translation.login_failed()}
+                </TypographyP>
+              )}
+
+              <Button
+                type="submit"
+                data-testid="login-button"
+                className="w-full"
+                disabled={isPending || !isValid}
+              >
+                {isPending && <Loader2 className="animate-spin" />}
+                {translation.login_submit()}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <TypographyMuted className="bg-card px-2">
+                {translation.login_or_continue_with()}
+              </TypographyMuted>
+            </div>
+          </div>
+
+          <Button variant="outline" className="w-full" type="button" disabled>
+            <GoogleIcon className="size-4" />
+            {translation.login_google()}
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
