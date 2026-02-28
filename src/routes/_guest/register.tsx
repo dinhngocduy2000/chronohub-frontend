@@ -7,7 +7,6 @@ import { type Resolver, useForm } from 'react-hook-form'
 import { GoogleIcon } from '@/assets/google-icon'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -18,39 +17,41 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { TypographyMuted, TypographyP } from '@/components/ui/typography'
-import type { ILoginFormType } from '@/interface/auth'
+import type { IRegisterFormType } from '@/interface/auth'
 import { getTranslations } from '@/lib/translation'
-import { useLoginMutation } from '@/queries/use-auth-query'
-import { createLoginFormSchemas } from '@/schemas/auth-schemas'
+import { useRegisterMutation } from '@/queries/use-auth-query'
+import { createRegisterFormSchemas } from '@/schemas/auth-schemas'
 
-export const Route = createFileRoute('/_guest/login')({ component: LoginPage })
+export const Route = createFileRoute('/_guest/register')({ component: RegisterPage })
 
-function LoginPage() {
+function RegisterPage() {
   const translation = getTranslations()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const form = useForm<ILoginFormType>({
+  const form = useForm<IRegisterFormType>({
     mode: 'onChange',
-    resolver: zodResolver(createLoginFormSchemas() as never) as Resolver<ILoginFormType>,
+    resolver: zodResolver(createRegisterFormSchemas() as never) as Resolver<IRegisterFormType>,
     defaultValues: {
+      name: '',
       email: '',
       password: '',
-      rememberMe: false,
+      confirmPassword: '',
     },
   })
   const {
     formState: { isValid },
   } = form
 
-  const { mutateAsync, isPending, error } = useLoginMutation({
+  const { mutateAsync, isPending, error } = useRegisterMutation({
     onSuccess: () => {
-      navigate({ to: '/' })
+      navigate({ to: '/login' })
     },
   })
 
-  const onSubmit = (data: ILoginFormType) => {
-    mutateAsync({ email: data.email, password: data.password, rememberMe: data.rememberMe })
+  const onSubmit = (data: IRegisterFormType) => {
+    mutateAsync({ name: data.name, email: data.email, password: data.password })
   }
 
   const serverError = error as AxiosError<{ detail: string }> | null
@@ -58,11 +59,11 @@ function LoginPage() {
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle data-testid="login_title" className="text-2xl">
-            {translation.login_title()}
+          <CardTitle data-testid="register_title" className="text-2xl">
+            {translation.register_title()}
           </CardTitle>
-          <CardDescription data-testid="login_description">
-            {translation.login_description()}
+          <CardDescription data-testid="register_description">
+            {translation.register_description()}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -70,15 +71,34 @@ function LoginPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
               <FormField
                 control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel data-testid="name">{translation.register_name_label()}</FormLabel>
+                    <FormControl>
+                      <Input
+                        data-testid="name-input"
+                        type="text"
+                        placeholder={translation.register_name_placeholder()}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel data-testid="email">{translation.login_email_label()}</FormLabel>
+                    <FormLabel data-testid="email">{translation.register_email_label()}</FormLabel>
                     <FormControl>
                       <Input
                         data-testid="email-input"
                         type="email"
-                        placeholder={translation.login_email_placeholder()}
+                        placeholder={translation.register_email_placeholder()}
                         {...field}
                       />
                     </FormControl>
@@ -93,14 +113,14 @@ function LoginPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel data-testid="password">
-                      {translation.login_password_label()}
+                      {translation.register_password_label()}
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           data-testid="password-input"
                           type={showPassword ? 'text' : 'password'}
-                          placeholder={translation.login_password_placeholder()}
+                          placeholder={translation.register_password_placeholder()}
                           className="pr-10"
                           {...field}
                         />
@@ -127,33 +147,56 @@ function LoginPage() {
 
               <FormField
                 control={form.control}
-                name="rememberMe"
+                name="confirmPassword"
                 render={({ field }) => (
-                  <FormItem className="flex items-center gap-2 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                    <FormLabel className="cursor-pointer font-normal">
-                      {translation.login_remember_me()}
+                  <FormItem>
+                    <FormLabel data-testid="confirm-password">
+                      {translation.register_confirm_password_label()}
                     </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          data-testid="confirm-password-input"
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          placeholder={translation.register_confirm_password_placeholder()}
+                          className="pr-10"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-xs"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          onClick={() => setShowConfirmPassword((prev) => !prev)}
+                          tabIndex={-1}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="size-4" />
+                          ) : (
+                            <Eye className="size-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
 
               {serverError && (
                 <TypographyP className="mt-0! text-sm text-destructive">
-                  {serverError?.response?.data?.detail || translation.login_failed()}
+                  {serverError?.response?.data?.detail || translation.register_failed()}
                 </TypographyP>
               )}
 
               <Button
                 type="submit"
-                data-testid="login-button"
+                data-testid="register-button"
                 className="w-full"
                 disabled={isPending || !isValid}
               >
                 {isPending && <Loader2 className="animate-spin" />}
-                {translation.login_submit()}
+                {translation.register_submit()}
               </Button>
             </form>
           </Form>
@@ -164,24 +207,24 @@ function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <TypographyMuted className="bg-card px-2">
-                {translation.login_or_continue_with()}
+                {translation.register_or_continue_with()}
               </TypographyMuted>
             </div>
           </div>
 
           <Button variant="outline" className="w-full" type="button" disabled>
             <GoogleIcon className="size-4" />
-            {translation.login_google()}
+            {translation.register_google()}
           </Button>
 
           <div className="mt-4 text-center text-sm">
             <TypographyMuted>
-              {translation.login_no_account()}{' '}
+              {translation.register_have_account()}{' '}
               <Link
-                to="/register"
+                to="/login"
                 className="font-medium text-primary underline-offset-4 hover:underline"
               >
-                {translation.login_register_link()}
+                {translation.register_login_link()}
               </Link>
             </TypographyMuted>
           </div>
