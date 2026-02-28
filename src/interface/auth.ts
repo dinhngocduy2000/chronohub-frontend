@@ -1,15 +1,17 @@
 import type z from 'zod'
 import type {
-  emailSchemas,
-  loginFormSchemas,
-  otpSchemas,
-  passwordSchemas,
+  createEmailSchemas,
+  createLoginFormSchemas,
+  createOtpSchemas,
+  createPasswordSchemas,
+  createRegisterFormSchemas,
 } from '@/schemas/auth-schemas'
 
-export type IEmailFormType = z.infer<typeof emailSchemas>
-export type IPasswordFormType = z.infer<typeof passwordSchemas>
-export type IOTPFormType = z.infer<typeof otpSchemas>
-export type ILoginFormType = z.infer<typeof loginFormSchemas>
+export type IEmailFormType = z.infer<ReturnType<typeof createEmailSchemas>>
+export type IPasswordFormType = z.infer<ReturnType<typeof createPasswordSchemas>>
+export type IOTPFormType = z.infer<ReturnType<typeof createOtpSchemas>>
+export type ILoginFormType = z.infer<ReturnType<typeof createLoginFormSchemas>>
+export type IRegisterFormType = z.infer<ReturnType<typeof createRegisterFormSchemas>>
 
 export type ILoginRequest = {
   email: string
