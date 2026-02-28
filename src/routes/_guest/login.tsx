@@ -5,7 +5,6 @@ import type { AxiosError } from 'axios'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { type Resolver, useForm } from 'react-hook-form'
-
 import { loginApi } from '@/api/auth'
 import { GoogleIcon } from '@/assets/google-icon'
 import { Button } from '@/components/ui/button'
@@ -25,13 +24,14 @@ import type { IResponseData } from '@/interface/api-response'
 import type { ILoginFormType } from '@/interface/auth'
 import { loginFormSchemas } from '@/schemas/auth-schemas'
 
-export const Route = createFileRoute('/login')({ component: LoginPage })
+export const Route = createFileRoute('/_guest/login')({ component: LoginPage })
 
 function LoginPage() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm<ILoginFormType>({
+    mode: 'onChange',
     resolver: zodResolver(loginFormSchemas as never) as Resolver<ILoginFormType>,
     defaultValues: {
       email: '',
@@ -39,6 +39,9 @@ function LoginPage() {
       rememberMe: false,
     },
   })
+  const {
+    formState: { isValid },
+  } = form
 
   const { mutateAsync, isPending, error } = useMutation({
     mutationFn: loginApi,
@@ -127,11 +130,11 @@ function LoginPage() {
 
               {serverError && (
                 <TypographyP className="mt-0! text-sm text-destructive">
-                  {serverError.response?.data?.message || 'Login failed. Please try again.'}
+                  {serverError?.response?.data?.message || 'Login failed. Please try again.'}
                 </TypographyP>
               )}
 
-              <Button type="submit" className="w-full" disabled={isPending}>
+              <Button type="submit" className="w-full" disabled={isPending || !isValid}>
                 {isPending && <Loader2 className="animate-spin" />}
                 Sign in
               </Button>
