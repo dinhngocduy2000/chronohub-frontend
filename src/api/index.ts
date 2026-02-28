@@ -10,13 +10,7 @@ const axiosConfig = axios.create({
 // Add a request interceptor
 axiosConfig.interceptors.request.use(
   (config) => {
-    // const accessToken = localStorage.getItem(KEY_STORAGE.ACCESS_TOKEN)
-    // if (accessToken) {
-    //   config.headers['Authorization'] = `Bearer ${accessToken}`
-    //   config.headers['Accept-Language'] = getCurrentLanguage()
-    // }
-
-    // // Do something before request is sent
+    config.withCredentials = true
     return config
   },
   (error) =>

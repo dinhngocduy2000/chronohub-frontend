@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { TypographyMuted, TypographyP } from '@/components/ui/typography'
+import { ROUTES } from '@/enum/routes'
 import type { ILoginFormType } from '@/interface/auth'
 import { getTranslations } from '@/lib/translation'
 import { useLoginMutation } from '@/queries/use-auth-query'
@@ -36,7 +37,7 @@ function LoginPage() {
     defaultValues: {
       email: '',
       password: '',
-      rememberMe: false,
+      is_save_session: false,
     },
   })
   const {
@@ -45,12 +46,16 @@ function LoginPage() {
 
   const { mutateAsync, isPending, error } = useLoginMutation({
     onSuccess: () => {
-      navigate({ to: '/' })
+      navigate({ to: ROUTES.HOME as string })
     },
   })
 
   const onSubmit = (data: ILoginFormType) => {
-    mutateAsync({ email: data.email, password: data.password, rememberMe: data.rememberMe })
+    mutateAsync({
+      email: data.email,
+      password: data.password,
+      is_save_session: data.is_save_session,
+    })
   }
 
   const serverError = error as AxiosError<{ detail: string }> | null
@@ -127,7 +132,7 @@ function LoginPage() {
 
               <FormField
                 control={form.control}
-                name="rememberMe"
+                name="is_save_session"
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-2 space-y-0">
                     <FormControl>
