@@ -22,11 +22,13 @@ import { Input } from '@/components/ui/input'
 import { TypographyMuted, TypographyP } from '@/components/ui/typography'
 import type { IResponseData } from '@/interface/api-response'
 import type { ILoginFormType } from '@/interface/auth'
+import { getTranslations } from '@/lib/translation'
 import { loginFormSchemas } from '@/schemas/auth-schemas'
 
 export const Route = createFileRoute('/_guest/login')({ component: LoginPage })
 
 function LoginPage() {
+  const translation = getTranslations()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
 
@@ -60,8 +62,8 @@ function LoginPage() {
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Sign in to your account</CardTitle>
-          <CardDescription>Enter your credentials to continue</CardDescription>
+          <CardTitle className="text-2xl">{translation.login_title()}</CardTitle>
+          <CardDescription>{translation.login_description()}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -71,9 +73,13 @@ function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{translation.login_email_label()}</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="you@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder={translation.login_email_placeholder()}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -85,12 +91,12 @@ function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>{translation.login_password_label()}</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           type={showPassword ? 'text' : 'password'}
-                          placeholder="Enter your password"
+                          placeholder={translation.login_password_placeholder()}
                           className="pr-10"
                           {...field}
                         />
@@ -123,20 +129,22 @@ function LoginPage() {
                     <FormControl>
                       <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
-                    <FormLabel className="cursor-pointer font-normal">Remember me</FormLabel>
+                    <FormLabel className="cursor-pointer font-normal">
+                      {translation.login_remember_me()}
+                    </FormLabel>
                   </FormItem>
                 )}
               />
 
               {serverError && (
                 <TypographyP className="mt-0! text-sm text-destructive">
-                  {serverError?.response?.data?.message || 'Login failed. Please try again.'}
+                  {serverError?.response?.data?.message || translation.login_failed()}
                 </TypographyP>
               )}
 
               <Button type="submit" className="w-full" disabled={isPending || !isValid}>
                 {isPending && <Loader2 className="animate-spin" />}
-                Sign in
+                {translation.login_submit()}
               </Button>
             </form>
           </Form>
@@ -146,13 +154,15 @@ function LoginPage() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <TypographyMuted className="bg-card px-2">Or continue with</TypographyMuted>
+              <TypographyMuted className="bg-card px-2">
+                {translation.login_or_continue_with()}
+              </TypographyMuted>
             </div>
           </div>
 
           <Button variant="outline" className="w-full" type="button" disabled>
             <GoogleIcon className="size-4" />
-            Continue with Google
+            {translation.login_google()}
           </Button>
         </CardContent>
       </Card>

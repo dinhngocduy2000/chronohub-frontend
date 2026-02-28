@@ -2,5 +2,16 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "app_name": "ChronoHub",
   "welcome": "Chào mừng đến với ChronoHub",
-  "footer_copyright": "Tất cả quyền được bảo lưu."
+  "footer_copyright": "Tất cả quyền được bảo lưu.",
+  "login_title": "Đăng nhập vào tài khoản",
+  "login_description": "Nhập thông tin đăng nhập để tiếp tục",
+  "login_email_label": "Email",
+  "login_email_placeholder": "you@example.com",
+  "login_password_label": "Mật khẩu",
+  "login_password_placeholder": "Nhập mật khẩu của bạn",
+  "login_remember_me": "Ghi nhớ đăng nhập",
+  "login_failed": "Đăng nhập thất bại. Vui lòng thử lại.",
+  "login_submit": "Đăng nhập",
+  "login_or_continue_with": "Hoặc tiếp tục với",
+  "login_google": "Tiếp tục với Google"
 }
