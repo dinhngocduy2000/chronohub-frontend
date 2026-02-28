@@ -15,7 +15,7 @@ export type IRegisterFormType = z.infer<ReturnType<typeof createRegisterFormSche
 
 export type ILoginRequest = {
   email: string
-  rememberMe?: boolean
+  is_save_session?: boolean
 } & Partial<IPasswordFormType> &
   Partial<IOTPFormType>
 
@@ -25,16 +25,14 @@ export type ILoginResponse = {
   user: IUserProfile
 }
 
+export type IRegisterRequest = Omit<IRegisterFormType, 'confirmPassword'>
+
 export type IVerifyOTPRequest = IEmailFormType & IOTPFormType
 
 export type IVerifyGoogleCodeRequest = {
   code: string
   redirectUri: string
 }
-
-export type IRegisterRequest = { fullName?: string } & IEmailFormType &
-  IPasswordFormType &
-  IOTPFormType
 
 export type IUserProfile = {
   id: string

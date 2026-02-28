@@ -131,7 +131,7 @@ test.describe('Login page', () => {
       await expect(page).toHaveURL('/')
     })
 
-    test('sends correct payload including rememberMe', async ({ page }) => {
+    test('sends correct payload including is_save_session', async ({ page }) => {
       let capturedBody: Record<string, unknown> | null = null
 
       await page.route(API_LOGIN, async (route) => {
@@ -171,7 +171,7 @@ test.describe('Login page', () => {
       expect(capturedBody).toMatchObject({
         email: 'ngocduydinh2000@gmail.com',
         password: '123456aA@',
-        rememberMe: true,
+        is_save_session: true,
       })
     })
 

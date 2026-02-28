@@ -171,13 +171,13 @@ The user asks questions about the following coding languages:
    interface FormState {
      email: string;
      password: string;
-     rememberMe: boolean;
+     is_save_session: boolean;
    }
 
    const [formData, setFormData] = useState<FormState>({
      email: '',
      password: '',
-     rememberMe: false,
+     is_save_session: false,
    });
    ```
 
