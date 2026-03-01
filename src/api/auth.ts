@@ -14,3 +14,13 @@ export const registerApi = async (data: IRegisterRequest): Promise<IResponseData
 export const trackSession = async (): Promise<IResponseData<null>> => {
   return await axiosConfig.get(AUTH_ENDPOINTS.TRACK_SESSION)
 }
+
+export const refreshTokenAPI = async (data: {
+  is_save_session: boolean
+}): Promise<IResponseData<unknown>> => {
+  return await axiosConfigWithoutAuth.post(AUTH_ENDPOINTS.REFRESH_TOKEN, data)
+}
+
+export const logoutAPI = async (): Promise<IResponseData<null>> => {
+  return await axiosConfig.post(AUTH_ENDPOINTS.LOGOUT)
+}
