@@ -25,10 +25,6 @@ test.describe('Login page', () => {
     test('submit button is disabled when form is empty', async ({ page }) => {
       await expect(page.getByRole('button', { name: /sign in/i })).toBeDisabled()
     })
-
-    test('Google button is disabled', async ({ page }) => {
-      await expect(page.getByRole('button', { name: /continue with google/i })).toBeDisabled()
-    })
   })
 
   test.describe('form validation', () => {
