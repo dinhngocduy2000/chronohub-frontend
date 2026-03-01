@@ -24,3 +24,7 @@ export const refreshTokenAPI = async (data: {
 export const logoutAPI = async (): Promise<IResponseData<null>> => {
   return await axiosConfig.post(AUTH_ENDPOINTS.LOGOUT)
 }
+
+export const getGoogleLoginURLAPI = async (): Promise<IResponseData<{ url: string }>> => {
+  return await axiosConfigWithoutAuth.post(AUTH_ENDPOINTS.GOOGLE_LOGIN_URL)
+}

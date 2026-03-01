@@ -1,9 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { loginApi, logoutAPI, registerApi, trackSession } from '@/api/auth'
+import { getGoogleLoginURLAPI, loginApi, logoutAPI, registerApi, trackSession } from '@/api/auth'
 import { AUTH_ENDPOINTS } from '@/enum/endpoints'
 import { KEY_STORAGE } from '@/enum/key-storage'
 import { ROUTES } from '@/enum/routes'
+import type { IResponseData } from '@/interface/api-response'
 import type { ILoginRequest, ILoginResponse, IRegisterRequest } from '@/interface/auth'
 import type { IMutation } from '@/interface/utils'
 
@@ -13,7 +14,7 @@ export const useLoginMutation = ({
   onSuccess,
   onError,
   onMutate,
-}: IMutation<ILoginResponse, ILoginRequest> = {}) => {
+}: IMutation<ILoginResponse, ILoginRequest>) => {
   return useMutation({
     mutationFn: loginApi,
     onSuccess: (_, variables) => {
@@ -70,6 +71,22 @@ export const useLogoutMutation = ({
       localStorage.removeItem(KEY_STORAGE.IS_SAVE_SESSION)
       navigate({ to: ROUTES.LOGIN as string })
       onSuccess?.()
+    },
+    onError,
+    onMutate,
+  })
+}
+
+export const useGetGoogleLoginURL = ({
+  onSuccess,
+  onError,
+  onMutate,
+}: IMutation<IResponseData<{ url: string }>, unknown>) => {
+  return useMutation({
+    mutationFn: getGoogleLoginURLAPI,
+    onSuccess: (res) => {
+      window.location.href = res.data.url
+      onSuccess?.(res)
     },
     onError,
     onMutate,

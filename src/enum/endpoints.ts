@@ -8,4 +8,5 @@ export enum AUTH_ENDPOINTS {
   TRACK_SESSION = '/auth/track',
   REFRESH_TOKEN = '/auth/refresh',
   LOGOUT = '/auth/logout',
+  GOOGLE_LOGIN_URL = '/auth/google/',
 }
