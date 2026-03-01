@@ -1,5 +1,8 @@
-import axios, { type AxiosResponse, HttpStatusCode } from 'axios'
+import axios, { AxiosError, type AxiosResponse, HttpStatusCode } from 'axios'
+import { KEY_STORAGE } from '@/enum/key-storage'
 import { ENV_CONFIGS } from '@/lib/env-const'
+import { handleLogout } from '@/lib/utils'
+import { refreshTokenAPI } from './auth'
 
 const axiosConfig = axios.create({
   baseURL: `${ENV_CONFIGS.VITE_API_ENDPOINT}`,
@@ -31,7 +34,7 @@ axiosConfig.interceptors.response.use(
       case HttpStatusCode.NotFound:
         break
       case HttpStatusCode.Unauthorized:
-        return
+        return await handleRenewToken(error)
 
       case HttpStatusCode.InternalServerError:
         break
@@ -61,34 +64,39 @@ axiosConfigWithoutAuth.interceptors.response.use(
   },
 )
 
-// const renewToken = async () => {
-//   // TODO: refresh token function here
-//   try {
-//     const refreshToken = localStorage.getItem(KEY_STORAGE.REFRESH_TOKEN)
-//     if (!refreshToken) {
-//       handleLogout()
-//       return
-//     }
-//     const response = await refreshTokenAPI({ refreshToken })
-//     localStorage.setItem(KEY_STORAGE.ACCESS_TOKEN, response.data.accessToken)
-//     localStorage.setItem(KEY_STORAGE.REFRESH_TOKEN, response.data.refreshToken)
-//     return response.data.accessToken
-//   } catch {
-//     handleLogout()
-//   }
-// }
+const renewToken = async () => {
+  // TODO: refresh token function here
+  try {
+    const isLoggedIn = localStorage.getItem(KEY_STORAGE.IS_LOGGED_IN)
+    if (!isLoggedIn) {
+      handleLogout()
+      throw new Error('Not logged in')
+    }
+    const data = {
+      is_save_session: localStorage.getItem(KEY_STORAGE.IS_SAVE_SESSION) === 'true',
+    }
+    await refreshTokenAPI(data)
+    localStorage.setItem(KEY_STORAGE.IS_LOGGED_IN, 'true')
+    if (data.is_save_session) {
+      localStorage.setItem(KEY_STORAGE.IS_SAVE_SESSION, 'true')
+    }
+  } catch (err) {
+    handleLogout()
+    throw err
+  }
+}
 
-// const handleRenewToken = async (error: unknown) => {
-//   if (!(error instanceof AxiosError)) {
-//     return
-//   }
-//   const originalRequest = error.config
-//   if (!originalRequest) {
-//     return
-//   }
-//   const newAccessToken = await renewToken()
-//   originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
-//   return await axiosConfig(originalRequest)
-// }
+const handleRenewToken = async (error: unknown) => {
+  if (!(error instanceof AxiosError)) {
+    return
+  }
+  const originalRequest = error.config
+  if (!originalRequest) {
+    return
+  }
+  await renewToken()
+
+  return await axiosConfig(originalRequest)
+}
 
 export default axiosConfig
