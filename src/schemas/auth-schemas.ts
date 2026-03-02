@@ -34,8 +34,10 @@ export const createLoginFormSchemas = () => {
   const t = getTranslations()
   return z.object({
     email: z
-      .email({ message: t.validation_email_invalid() })
-      .min(1, { message: t.validation_email_required() }),
+      .string()
+      .min(1, { message: t.validation_email_required() })
+      .email({ message: t.validation_email_invalid() }),
+
     password: z.string().min(1, { message: t.validation_password_required() }),
     is_save_session: z.boolean().default(false),
   })
@@ -50,8 +52,9 @@ export const createRegisterFormSchemas = () => {
         z.string().min(1, { message: t.validation_name_required() }),
       ),
       email: z
-        .email({ message: t.validation_email_invalid() })
-        .min(1, { message: t.validation_email_required() }),
+        .string()
+        .min(1, { message: t.validation_email_required() })
+        .email({ message: t.validation_email_invalid() }),
 
       password: z
         .string()

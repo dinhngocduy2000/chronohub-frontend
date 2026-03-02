@@ -8,6 +8,8 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env: 
+        VITE_API_ENDPOINT: /api/v1
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -23,6 +25,7 @@ jobs:
       run: pnpm exec playwright install --with-deps
     - name: Run Playwright tests
       run: pnpm exec playwright test
+      
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:

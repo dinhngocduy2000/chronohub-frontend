@@ -18,16 +18,12 @@ test.describe('Login page', () => {
       await expect(page.getByTestId('email')).toBeVisible()
       await expect(page.getByTestId('password')).toBeVisible()
       await expect(page.getByRole('checkbox', { name: /remember me/i })).toBeVisible()
-      await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible()
-      await expect(page.getByRole('button', { name: /continue with google/i })).toBeVisible()
+      await expect(page.getByTestId('login-button')).toBeVisible()
+      await expect(page.getByTestId('login-google')).toBeVisible()
     })
 
     test('submit button is disabled when form is empty', async ({ page }) => {
-      await expect(page.getByRole('button', { name: /sign in/i })).toBeDisabled()
-    })
-
-    test('Google button is disabled', async ({ page }) => {
-      await expect(page.getByRole('button', { name: /continue with google/i })).toBeDisabled()
+      await expect(page.getByTestId('login-button')).toBeDisabled()
     })
   })
 

@@ -21,7 +21,7 @@ import { TypographyMuted, TypographyP } from '@/components/ui/typography'
 import { ROUTES } from '@/enum/routes'
 import type { ILoginFormType } from '@/interface/auth'
 import { getTranslations } from '@/lib/translation'
-import { useLoginMutation } from '@/queries/use-auth-query'
+import { useGetGoogleLoginURL, useLoginMutation } from '@/queries/use-auth-query'
 import { createLoginFormSchemas } from '@/schemas/auth-schemas'
 
 export const Route = createFileRoute('/_guest/login')({ component: LoginPage })
@@ -30,7 +30,12 @@ function LoginPage() {
   const translation = getTranslations()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
-
+  const { mutateAsync: getGoogleLoginURL, isPending: isGettingGoogleLoginURL } =
+    useGetGoogleLoginURL({
+      onSuccess: (data) => {
+        console.log(data)
+      },
+    })
   const form = useForm<ILoginFormType>({
     mode: 'onChange',
     resolver: zodResolver(createLoginFormSchemas() as never) as Resolver<ILoginFormType>,
@@ -174,7 +179,14 @@ function LoginPage() {
             </div>
           </div>
 
-          <Button variant="outline" className="w-full" type="button" disabled>
+          <Button
+            onClick={() => getGoogleLoginURL()}
+            disabled={isGettingGoogleLoginURL}
+            variant="outline"
+            className="w-full"
+            type="button"
+            data-testid="login-google"
+          >
             <GoogleIcon className="size-4" />
             {translation.login_google()}
           </Button>

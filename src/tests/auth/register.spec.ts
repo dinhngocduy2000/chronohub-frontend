@@ -28,10 +28,6 @@ test.describe('Register page', () => {
       await expect(page.getByRole('button', { name: /sign up/i })).toBeDisabled()
     })
 
-    test('Google button is disabled', async ({ page }) => {
-      await expect(page.getByRole('button', { name: /continue with google/i })).toBeDisabled()
-    })
-
     test('displays link to login page', async ({ page }) => {
       const loginLink = page.getByRole('link', { name: /sign in/i })
       await expect(loginLink).toBeVisible()
