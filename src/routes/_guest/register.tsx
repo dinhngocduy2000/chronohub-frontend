@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import type { AxiosError } from 'axios'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { type Resolver, useForm } from 'react-hook-form'
 import { GoogleIcon } from '@/assets/google-icon'
@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input'
 import { TypographyMuted, TypographyP } from '@/components/ui/typography'
 import type { IRegisterFormType } from '@/interface/auth'
 import { getTranslations } from '@/lib/translation'
-import { useRegisterMutation } from '@/queries/use-auth-query'
+import { useGetGoogleLoginURL, useRegisterMutation } from '@/queries/use-auth-query'
 import { createRegisterFormSchemas } from '@/schemas/auth-schemas'
 
 export const Route = createFileRoute('/_guest/register')({ component: RegisterPage })
@@ -29,7 +29,12 @@ function RegisterPage() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
+  const { mutateAsync: getGoogleLoginURL, isPending: isGettingGoogleLoginURL } =
+    useGetGoogleLoginURL({
+      onSuccess: (data) => {
+        console.log(data)
+      },
+    })
   const form = useForm<IRegisterFormType>({
     mode: 'onChange',
     resolver: zodResolver(createRegisterFormSchemas() as never) as Resolver<IRegisterFormType>,
@@ -193,9 +198,9 @@ function RegisterPage() {
                 type="submit"
                 data-testid="register-button"
                 className="w-full"
+                loading={isPending}
                 disabled={isPending || !isValid}
               >
-                {isPending && <Loader2 className="animate-spin" />}
                 {translation.register_submit()}
               </Button>
             </form>
@@ -212,7 +217,14 @@ function RegisterPage() {
             </div>
           </div>
 
-          <Button variant="outline" className="w-full" type="button" disabled>
+          <Button
+            loading={isGettingGoogleLoginURL}
+            onClick={() => getGoogleLoginURL()}
+            disabled={isGettingGoogleLoginURL}
+            variant="outline"
+            className="w-full"
+            type="button"
+          >
             <GoogleIcon className="size-4" />
             {translation.register_google()}
           </Button>

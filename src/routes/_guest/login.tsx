@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import type { AxiosError } from 'axios'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { type Resolver, useForm } from 'react-hook-form'
 import { GoogleIcon } from '@/assets/google-icon'
@@ -161,8 +161,8 @@ function LoginPage() {
                 data-testid="login-button"
                 className="w-full"
                 disabled={isPending || !isValid}
+                loading={isPending}
               >
-                {isPending && <Loader2 className="animate-spin" />}
                 {translation.login_submit()}
               </Button>
             </form>
@@ -180,6 +180,7 @@ function LoginPage() {
           </div>
 
           <Button
+            loading={isGettingGoogleLoginURL}
             onClick={() => getGoogleLoginURL()}
             disabled={isGettingGoogleLoginURL}
             variant="outline"
