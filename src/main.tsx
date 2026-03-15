@@ -8,7 +8,7 @@ import { queryClient } from './queries'
 import { routeTree } from './routeTree.gen'
 import { store } from './stores'
 
-const isTest = process.env.CI === 'true'
+const isTest = import.meta.env.VITE_CI === 'true'
 const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
