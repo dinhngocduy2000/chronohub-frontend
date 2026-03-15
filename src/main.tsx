@@ -14,8 +14,8 @@ const router = createRouter({
   defaultPreload: 'intent',
   scrollRestoration: true,
   defaultPendingComponent: isTest ? undefined : RouteLoadingFallback,
-  defaultPendingMs: isTest ? 0 : undefined,
-  defaultPendingMinMs: isTest ? 200 : undefined,
+  defaultPendingMs: isTest ? 500 : 0,
+  defaultPendingMinMs: isTest ? 500 : 200,
 })
 
 declare module '@tanstack/react-router' {
