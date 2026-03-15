@@ -4,7 +4,8 @@ import type { AxiosError } from 'axios'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { type Resolver, useForm } from 'react-hook-form'
-import { GoogleIcon } from '@/assets/google-icon'
+import AppLogo from '@/assets/svgs/app-logo'
+import { GoogleIcon } from '@/assets/svgs/google-icon'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -65,7 +66,8 @@ function LoginPage() {
 
   const serverError = error as AxiosError<{ detail: string }> | null
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
+    <div className="flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center px-4 py-12">
+      <AppLogo className="m-auto" />
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle data-testid="login_title" className="text-2xl">
