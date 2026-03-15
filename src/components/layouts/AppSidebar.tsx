@@ -12,6 +12,7 @@ import {
   MessagesSquare,
   Users,
 } from 'lucide-react'
+import AppLogo from '@/assets/svgs/app-logo'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   Sidebar,
@@ -79,15 +80,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link to={ROUTES.HOME}>
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Compass className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{t.app_name()}</span>
-                </div>
-              </Link>
+            <SidebarMenuButton
+              size="lg"
+              asChild
+              className="h-20 flex justify-center items-center w-full"
+            >
+              <AppLogo />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
