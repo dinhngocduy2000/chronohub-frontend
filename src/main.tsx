@@ -8,13 +8,14 @@ import { queryClient } from './queries'
 import { routeTree } from './routeTree.gen'
 import { store } from './stores'
 
+const isTest = import.meta.env.VITE_CI === 'true'
 const router = createRouter({
   routeTree,
-  defaultPreload: false,
+  defaultPreload: 'intent',
   scrollRestoration: true,
-  defaultPendingComponent: RouteLoadingFallback,
-  defaultPendingMs: 0,
-  defaultPendingMinMs: 200,
+  defaultPendingComponent: isTest ? undefined : RouteLoadingFallback,
+  defaultPendingMs: isTest ? 500 : 0,
+  defaultPendingMinMs: isTest ? 500 : 200,
 })
 
 declare module '@tanstack/react-router' {
