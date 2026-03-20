@@ -25,3 +25,5 @@ blob-report
 src/routeTree.gen.ts
 # Cursor rules (auto-generated from .github/instructions)
 .cursor/rules/
+
+.pnpm-store
