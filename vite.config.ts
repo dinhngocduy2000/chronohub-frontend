@@ -5,8 +5,8 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 // biome-ignore lint/style/useNodejsImportProtocol: this is a node module
 import path from 'path'
-import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   define: {
@@ -51,5 +51,11 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/tests/setup.ts'],
+    css: true,
   },
 })
