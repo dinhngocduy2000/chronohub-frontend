@@ -3,14 +3,13 @@ import { CalendarGrid } from '@/components/reusable/calendar/calendar-grid'
 import { CalendarHeader } from '@/components/reusable/calendar/calendar-header'
 import { CalendarWeek } from '@/components/reusable/calendar/calendar-week'
 import { useCalendar } from '@/hooks/use-calendar'
-import { multiDayEvents } from '@/lib/multi-day-events'
 import { sampleEvents } from '@/lib/sample-events'
 export const Route = createFileRoute('/_authenticated/')({ component: HomePage })
 
 function HomePage() {
   const { currentDate, view, navigatePrevious, navigateNext, goToToday, changeView } = useCalendar()
 
-  const allEvents = [...sampleEvents, ...multiDayEvents]
+  const allEvents = sampleEvents
 
   return (
     <main className="min-h-screen w-full bg-background">

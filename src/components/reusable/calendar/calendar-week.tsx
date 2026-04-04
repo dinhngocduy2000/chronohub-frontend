@@ -3,22 +3,24 @@
 
 import { Link } from '@tanstack/react-router'
 import { useMemo } from 'react'
+import type { IEventListItem } from '@/interface/events'
 import {
   formatDate,
   getEventCollisions,
   getEventPositionInGroup,
   getEventPositionStyle,
+  getEventTimeRangeForDay,
   getWeekDates,
   getWeekDays,
   isToday,
   parseDateString,
 } from '@/lib/calendar-utils'
-import type { Event } from '@/lib/sample-events'
+import { getCategoryColor } from '@/lib/sample-events'
 import { cn } from '@/lib/utils'
 
 interface CalendarWeekProps {
   currentDate: Date
-  events: Event[]
+  events: IEventListItem[]
 }
 
 export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
@@ -28,11 +30,11 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
 
   // For week view, show all events (both single and multi-day) in their time positions
   const eventsByDate = useMemo(() => {
-    const allEventsExpandedMap = new Map<string, Event[]>()
+    const allEventsExpandedMap = new Map<string, IEventListItem[]>()
 
     events.forEach((event) => {
-      const startDate = parseDateString(event.date)
-      const endDate = parseDateString(event.endDate || event.date)
+      const startDate = parseDateString(event.start_time)
+      const endDate = parseDateString(event.end_time || event.start_time)
 
       const currentDate = new Date(startDate)
       while (currentDate <= endDate) {
@@ -98,7 +100,7 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
           const dateString = formatDate(date)
           const dayEvents = eventsByDate.get(dateString) || []
           const today = isToday(dateString)
-          const collisionGroups = getEventCollisions(dayEvents)
+          const collisionGroups = getEventCollisions(dayEvents, dateString)
 
           return (
             <div
@@ -121,7 +123,14 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
                     ? getEventPositionInGroup(eventIndex, collisionGroup)
                     : { left: 0, width: 100 }
 
-                  return <WeekEventBlock key={event.id} event={event} position={position} />
+                  return (
+                    <WeekEventBlock
+                      key={`${event.id}-${dateString}`}
+                      event={event}
+                      dayDate={dateString}
+                      position={position}
+                    />
+                  )
                 })}
               </div>
             </div>
@@ -133,12 +142,18 @@ export function CalendarWeek({ currentDate, events }: CalendarWeekProps) {
 }
 
 interface WeekEventBlockProps {
-  event: Event
+  event: IEventListItem
+  dayDate: string
   position?: { left: number; width: number }
 }
 
-function WeekEventBlock({ event, position = { left: 0, width: 100 } }: WeekEventBlockProps) {
-  const style = getEventPositionStyle(event.startTime, event.endTime)
+function WeekEventBlock({
+  event,
+  dayDate,
+  position = { left: 0, width: 100 },
+}: WeekEventBlockProps) {
+  const range = getEventTimeRangeForDay(event, dayDate)
+  const style = getEventPositionStyle(range.start, range.end)
   const hasCollision = position.width < 100
 
   return (
@@ -156,15 +171,15 @@ function WeekEventBlock({ event, position = { left: 0, width: 100 } }: WeekEvent
       <div
         className="w-full h-full rounded px-2 py-1 text-white text-xs font-medium overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer flex flex-col justify-start"
         style={{
-          backgroundColor: event.color,
+          backgroundColor: getCategoryColor(event.category),
           opacity: hasCollision ? 0.85 : 0.9,
           fontSize: hasCollision ? '10px' : '12px',
         }}
       >
-        <div className="font-semibold truncate leading-tight">{event.title}</div>
+        <div className="font-semibold truncate leading-tight">{event.name}</div>
         {!hasCollision && (
           <div className="text-xs opacity-90 truncate leading-tight">
-            {event.startTime} - {event.endTime}
+            {range.start} - {range.end}
           </div>
         )}
       </div>

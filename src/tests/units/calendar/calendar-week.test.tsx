@@ -82,11 +82,11 @@ describe('CalendarWeek', () => {
       expect(screen.getByText('09:00 - 10:00')).toBeInTheDocument()
     })
 
-    it('applies event color as background', () => {
+    it('applies category color as background', () => {
       render(
         <CalendarWeek
           currentDate={wedFeb12}
-          events={[makeEvent({ title: 'Colored', date: '2025-02-10', color: '#D62828' })]}
+          events={[makeEvent({ title: 'Colored', date: '2025-02-10', category: 'deadline' })]}
         />,
       )
       const block = screen.getByText('Colored').closest('div[style]')

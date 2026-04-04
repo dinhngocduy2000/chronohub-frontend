@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { getCategoryColor } from '@/lib/sample-events'
 import { makeEvent } from '@/tests/test-utils'
 import { EventItem } from '../../../components/reusable/calendar/event-item'
 
@@ -18,23 +19,19 @@ describe('EventItem', () => {
     date: '2025-02-03',
     startTime: '09:00',
     endTime: '09:30',
-    location: 'Conference Room A',
-    description: 'Daily sync',
     category: 'meeting',
-    color: '#FF6B35',
   })
 
-  it('renders event title, formatted time, and location', () => {
+  it('renders event name and formatted start time', () => {
     render(<EventItem event={event} />)
     expect(screen.getByText('Team Standup')).toBeInTheDocument()
     expect(screen.getByText('9:00 AM')).toBeInTheDocument()
-    expect(screen.getByText('Conference Room A')).toBeInTheDocument()
   })
 
-  it('applies event color as background', () => {
+  it('applies category color as background', () => {
     render(<EventItem event={event} />)
-    const block = screen.getByTitle('Team Standup at Conference Room A')
-    expect(block).toHaveStyle({ backgroundColor: '#FF6B35' })
+    const block = screen.getByTitle('Team Standup')
+    expect(block).toHaveStyle({ backgroundColor: getCategoryColor('meeting') })
   })
 
   it('links to the event detail page', () => {
@@ -42,9 +39,9 @@ describe('EventItem', () => {
     expect(screen.getByRole('link')).toHaveAttribute('href', '/events/evt-1')
   })
 
-  it('sets a title attribute with event name and location', () => {
+  it('sets a title attribute with the event name', () => {
     render(<EventItem event={event} />)
-    expect(screen.getByTitle('Team Standup at Conference Room A')).toBeInTheDocument()
+    expect(screen.getByTitle('Team Standup')).toBeInTheDocument()
   })
 
   it('renders PM times correctly', () => {

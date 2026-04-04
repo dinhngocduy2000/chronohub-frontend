@@ -27,3 +27,7 @@ src/routeTree.gen.ts
 .cursor/rules/
 
 .pnpm-store
+
+.agents/
+
+skills-lock.json

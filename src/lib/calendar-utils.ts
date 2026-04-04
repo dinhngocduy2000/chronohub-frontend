@@ -1,4 +1,4 @@
-import type { Event } from './sample-events'
+import type { IEventListItem } from '@/interface/events'
 
 export function getDaysInMonth(date: Date): number {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
@@ -9,11 +9,44 @@ export function getFirstDayOfMonth(date: Date): number {
 }
 
 export function formatDate(date: Date): string {
-  return date.toISOString().split('T')[0] // YYYY-MM-DD
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+/** Calendar date (YYYY-MM-DD) from a backend datetime string (space-separated or ISO 8601). */
+export function getEventDatePart(value: string | undefined): string {
+  if (value == null || value === '') return ''
+  const trimmed = value.trim()
+  if (trimmed.includes('T')) {
+    return trimmed.split('T')[0]
+  }
+  return trimmed.split(' ')[0]
+}
+
+/** Wall-clock HH:mm from a backend datetime; also accepts a bare "HH:mm" string. */
+export function getEventTimePart(value: string): string {
+  const trimmed = value.trim()
+  if (trimmed.includes('T')) {
+    const timePart = trimmed.split('T')[1] ?? ''
+    const hhmmss = timePart.replace(/Z$/i, '').split('.')[0] ?? ''
+    const [h = '0', m = '00'] = hhmmss.split(':')
+    return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`
+  }
+  const spaceParts = trimmed.split(/\s+/)
+  if (spaceParts.length >= 2) {
+    const t = spaceParts[spaceParts.length - 1]
+    const [h = '0', m = '00'] = t.split(':')
+    return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`
+  }
+  const [h = '0', m = '00'] = trimmed.split(':')
+  return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`
 }
 
 export function parseDateString(dateString: string): Date {
-  const [year, month, day] = dateString.split('-').map(Number)
+  const dateOnly = getEventDatePart(dateString)
+  const [year, month, day] = dateOnly.split('-').map(Number)
   return new Date(year, month - 1, day)
 }
 
@@ -22,7 +55,8 @@ export function formatMonthYear(date: Date): string {
 }
 
 export function formatTime(timeString: string): string {
-  const [hours, minutes] = timeString.split(':')
+  const timePart = getEventTimePart(timeString)
+  const [hours, minutes] = timePart.split(':')
   const hour = parseInt(hours, 10)
   const ampm = hour >= 12 ? 'PM' : 'AM'
   const displayHour = hour % 12 || 12
@@ -101,6 +135,34 @@ export function getEventPositionStyle(startTime: string, endTime: string) {
   }
 }
 
+/** Visible time segment for an event on a specific calendar day (week / overlap logic). */
+export function getEventTimeRangeForDay(
+  event: IEventListItem,
+  dayDate: string,
+): { start: string; end: string } {
+  const startDate = getEventDatePart(event.start_time)
+  const endDate = getEventDatePart(event.end_time)
+
+  if (dayDate < startDate || dayDate > endDate) {
+    return { start: '00:00', end: '00:00' }
+  }
+
+  if (startDate === endDate) {
+    return {
+      start: getEventTimePart(event.start_time),
+      end: getEventTimePart(event.end_time),
+    }
+  }
+
+  if (dayDate === startDate) {
+    return { start: getEventTimePart(event.start_time), end: '23:59' }
+  }
+  if (dayDate === endDate) {
+    return { start: '00:00', end: getEventTimePart(event.end_time) }
+  }
+  return { start: '00:00', end: '23:59' }
+}
+
 export function getWeekStart(date: Date): Date {
   const weekStart = new Date(date)
   weekStart.setDate(date.getDate() - date.getDay())
@@ -118,21 +180,24 @@ export function getWeekDates(date: Date): Date[] {
   return dates
 }
 
-export function groupEventsByDate(events: Array<Event>) {
-  const map = new Map<string, Array<Event>>()
+export function groupEventsByDate(events: Array<IEventListItem>) {
+  const map = new Map<string, Array<IEventListItem>>()
   events.forEach((event) => {
-    if (!map.has(event.date)) {
-      map.set(event.date, [])
+    const key = getEventDatePart(event.start_time)
+    if (!map.has(key)) {
+      map.set(key, [])
     }
-    map.get(event.date)?.push(event)
+    map.get(key)?.push(event)
   })
   return map
 }
 
 export function getDatesBetween(startDate: string, endDate: string): string[] {
   const dates: string[] = []
-  const current = new Date(parseDateString(startDate))
-  const end = new Date(parseDateString(endDate))
+  const startKey = getEventDatePart(startDate)
+  const endKey = getEventDatePart(endDate)
+  const current = new Date(parseDateString(startKey))
+  const end = new Date(parseDateString(endKey))
 
   while (current <= end) {
     dates.push(formatDate(current))
@@ -142,11 +207,14 @@ export function getDatesBetween(startDate: string, endDate: string): string[] {
   return dates
 }
 
-export function expandMultiDayEvents(events: Array<Event>) {
-  const expandedMap = new Map<string, Array<Event>>()
+export function expandMultiDayEvents(events: Array<IEventListItem>) {
+  const expandedMap = new Map<string, Array<IEventListItem>>()
 
   events.forEach((event) => {
-    const dates = event.endDate ? getDatesBetween(event.date, event.endDate) : [event.date]
+    const startKey = getEventDatePart(event.start_time)
+    const endKey = getEventDatePart(event.end_time)
+    const dates =
+      endKey !== startKey ? getDatesBetween(event.start_time, event.end_time) : [startKey]
 
     dates.forEach((date) => {
       if (!expandedMap.has(date)) {
@@ -159,38 +227,44 @@ export function expandMultiDayEvents(events: Array<Event>) {
   return expandedMap
 }
 
-export function isMultiDayEvent(event: { endDate?: string; date: string }): boolean {
-  return !!event.endDate && event.endDate !== event.date
+export function isMultiDayEvent(event: { end_time?: string; start_time: string }): boolean {
+  const end = getEventDatePart(event.end_time)
+  const start = getEventDatePart(event.start_time)
+  if (!end) return false
+  return end !== start
 }
 
-export function isEventStartDay(event: Event, checkDate: string): boolean {
-  return event.date === checkDate
+export function isEventStartDay(event: IEventListItem, checkDate: string): boolean {
+  return getEventDatePart(event.start_time) === checkDate
 }
 
-export function isEventEndDay(event: { endDate?: string }, checkDate: string): boolean {
-  return event.endDate === checkDate
+export function isEventEndDay(event: IEventListItem, checkDate: string): boolean {
+  return getEventDatePart(event.end_time) === checkDate
 }
 
-export function eventsOverlap(
-  event1: { startTime: string; endTime: string },
-  event2: { startTime: string; endTime: string },
+export function eventsOverlapOnDay(
+  event1: IEventListItem,
+  event2: IEventListItem,
+  dayDate: string,
 ): boolean {
-  const e1Start = timeToMinutes(event1.startTime)
-  const e1End = timeToMinutes(event1.endTime)
-  const e2Start = timeToMinutes(event2.startTime)
-  const e2End = timeToMinutes(event2.endTime)
+  const r1 = getEventTimeRangeForDay(event1, dayDate)
+  const r2 = getEventTimeRangeForDay(event2, dayDate)
+  const e1Start = timeToMinutes(r1.start)
+  const e1End = timeToMinutes(r1.end)
+  const e2Start = timeToMinutes(r2.start)
+  const e2End = timeToMinutes(r2.end)
 
   return e1Start < e2End && e2Start < e1End
 }
 
-export function getEventCollisions(events: Array<{ startTime: string; endTime: string }>) {
+export function getEventCollisions(events: Array<IEventListItem>, dayDate: string) {
   const collisionGroups: number[][] = []
 
   events.forEach((event, index) => {
     let foundGroup = false
 
     for (const group of collisionGroups) {
-      if (group.some((i) => eventsOverlap(events[i], event))) {
+      if (group.some((i) => eventsOverlapOnDay(events[i], event, dayDate))) {
         group.push(index)
         foundGroup = true
         break
