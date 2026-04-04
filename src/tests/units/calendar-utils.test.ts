@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
-  eventsOverlap,
+  eventsOverlapOnDay,
   expandMultiDayEvents,
   formatDate,
   formatMonthYear,
@@ -53,16 +53,16 @@ describe('getFirstDayOfMonth', () => {
 })
 
 describe('formatDate', () => {
-  it('formats a UTC date as YYYY-MM-DD', () => {
-    expect(formatDate(new Date(Date.UTC(2025, 1, 14)))).toBe('2025-02-14')
+  it('formats a local calendar date as YYYY-MM-DD', () => {
+    expect(formatDate(new Date(2025, 1, 14))).toBe('2025-02-14')
   })
 
   it('zero-pads single-digit months and days', () => {
-    expect(formatDate(new Date(Date.UTC(2025, 0, 5)))).toBe('2025-01-05')
+    expect(formatDate(new Date(2025, 0, 5))).toBe('2025-01-05')
   })
 
   it('always returns YYYY-MM-DD format', () => {
-    expect(formatDate(new Date(Date.UTC(2025, 11, 25)))).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    expect(formatDate(new Date(2025, 11, 25))).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 })
 
@@ -273,7 +273,7 @@ describe('isMultiDayEvent', () => {
     { date: '2025-02-18', endDate: undefined, expected: false },
     { date: '2025-02-18', endDate: '2025-02-18', expected: false },
   ])('returns $expected when date=$date endDate=$endDate', ({ date, endDate, expected }) => {
-    expect(isMultiDayEvent({ date, endDate })).toBe(expected)
+    expect(isMultiDayEvent({ start_time: date, end_time: endDate })).toBe(expected)
   })
 })
 
@@ -295,7 +295,9 @@ describe('isEventStartDay / isEventEndDay', () => {
 // Collision / positioning helpers
 // ---------------------------------------------------------------------------
 
-describe('eventsOverlap', () => {
+describe('eventsOverlapOnDay', () => {
+  const day = '2025-02-10'
+
   it.each([
     { a: ['09:00', '10:00'], b: ['09:30', '11:00'], expected: true, label: 'partial overlap' },
     {
@@ -312,26 +314,87 @@ describe('eventsOverlap', () => {
     },
   ])('$label → $expected', ({ a, b, expected }) => {
     expect(
-      eventsOverlap({ startTime: a[0], endTime: a[1] }, { startTime: b[0], endTime: b[1] }),
+      eventsOverlapOnDay(
+        {
+          id: '1',
+          name: 'Event 1',
+          start_time: `${day} ${a[0]}`,
+          end_time: `${day} ${a[1]}`,
+          priority: 'high',
+          category: 'work',
+        },
+        {
+          id: '2',
+          name: 'Event 2',
+          start_time: `${day} ${b[0]}`,
+          end_time: `${day} ${b[1]}`,
+          priority: 'high',
+          category: 'work',
+        },
+        day,
+      ),
     ).toBe(expected)
   })
 })
 
 describe('getEventCollisions', () => {
+  const day = '2025-02-10'
+
   it('groups overlapping events into the same collision group', () => {
-    const groups = getEventCollisions([
-      { startTime: '09:00', endTime: '10:00' },
-      { startTime: '09:30', endTime: '10:30' },
-      { startTime: '14:00', endTime: '15:00' },
-    ])
+    const groups = getEventCollisions(
+      [
+        {
+          id: '1',
+          name: 'Event 1',
+          start_time: `${day} 09:00`,
+          end_time: `${day} 10:00`,
+          priority: 'high',
+          category: 'work',
+        },
+        {
+          id: '2',
+          name: 'Event 2',
+          start_time: `${day} 09:30`,
+          end_time: `${day} 10:30`,
+          priority: 'high',
+          category: 'work',
+        },
+        {
+          id: '3',
+          name: 'Event 3',
+          start_time: `${day} 14:00`,
+          end_time: `${day} 15:00`,
+          priority: 'high',
+          category: 'work',
+        },
+      ],
+      day,
+    )
     expect(groups).toEqual([[0, 1], [2]])
   })
 
   it('gives each non-overlapping event its own group', () => {
-    const groups = getEventCollisions([
-      { startTime: '09:00', endTime: '10:00' },
-      { startTime: '11:00', endTime: '12:00' },
-    ])
+    const groups = getEventCollisions(
+      [
+        {
+          id: '1',
+          name: 'Event 1',
+          start_time: `${day} 09:00`,
+          end_time: `${day} 10:00`,
+          priority: 'high',
+          category: 'work',
+        },
+        {
+          id: '2',
+          name: 'Event 2',
+          start_time: `${day} 11:00`,
+          end_time: `${day} 12:00`,
+          priority: 'high',
+          category: 'work',
+        },
+      ],
+      day,
+    )
     expect(groups).toHaveLength(2)
     expect(groups.every((g) => g.length === 1)).toBe(true)
   })

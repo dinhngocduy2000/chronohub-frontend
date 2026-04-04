@@ -2,6 +2,7 @@
 
 import { Link } from '@tanstack/react-router'
 import { useMemo } from 'react'
+import type { IEventListItem } from '@/interface/events'
 import {
   getCalendarDays,
   getDateForDay,
@@ -12,13 +13,13 @@ import {
   isToday,
   parseDateString,
 } from '@/lib/calendar-utils'
-import type { Event } from '@/lib/sample-events'
+import { getCategoryColor } from '@/lib/sample-events'
 import { cn } from '@/lib/utils'
 import { EventItem } from './event-item'
 
 interface CalendarGridProps {
   currentDate: Date
-  events: Event[]
+  events: IEventListItem[]
 }
 
 export function CalendarGrid({ currentDate, events }: CalendarGridProps) {
@@ -48,7 +49,7 @@ export function CalendarGrid({ currentDate, events }: CalendarGridProps) {
 
       {/* Calendar grid */}
       <div className="grid grid-cols-7 relative">
-        {calendarDays.map((day) => {
+        {calendarDays.map((day, cellIndex) => {
           const dateString = day ? getDateForDay(currentDate, day) : ''
           const dayEvents = day ? singleDayEventsByDate.get(dateString) || [] : []
           const today = isToday(dateString)
@@ -56,7 +57,7 @@ export function CalendarGrid({ currentDate, events }: CalendarGridProps) {
 
           return (
             <div
-              key={`${day}`}
+              key={day !== null ? `day-${day}` : `empty-${cellIndex}`}
               className={cn(
                 'min-h-32 p-3 border-r border-b hover:bg-accent/50 transition-colors relative',
                 day === null && 'bg-muted/30',
@@ -105,14 +106,14 @@ export function CalendarGrid({ currentDate, events }: CalendarGridProps) {
 }
 
 interface MultiDayEventBarProps {
-  event: Event
+  event: IEventListItem
   calendarDays: (number | null)[]
   currentDate: Date
 }
 
 function MultiDayEventBar({ event, calendarDays, currentDate }: MultiDayEventBarProps) {
-  const startDate = parseDateString(event.date)
-  const endDate = parseDateString(event.endDate || event.date)
+  const startDate = parseDateString(event.start_time)
+  const endDate = parseDateString(event.end_time)
 
   // Find the index of the first day in calendar that falls within event range
   let startIndex = -1
@@ -147,11 +148,11 @@ function MultiDayEventBar({ event, calendarDays, currentDate }: MultiDayEventBar
       <div
         className="w-full h-full rounded px-2 text-white text-xs font-medium overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer flex items-center whitespace-nowrap"
         style={{
-          backgroundColor: event.color,
+          backgroundColor: getCategoryColor(event.category),
           opacity: 0.85,
         }}
       >
-        <span className="truncate">{event.title}</span>
+        <span className="truncate">{event.name}</span>
       </div>
     </Link>
   )
