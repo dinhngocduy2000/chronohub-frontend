@@ -6,3 +6,10 @@ export type IEventListItem = {
   priority: string
   category: string
 }
+
+export type IEventCalendarRequest = {
+  month: number
+  year: number
+  group_id: string
+  owner_id?: string
+}

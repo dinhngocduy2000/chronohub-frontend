@@ -1,6 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import { Bell, Check, CreditCard, Globe, LogOut, Settings, User } from 'lucide-react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -19,15 +19,29 @@ import { SidebarTrigger } from '@/components/ui/sidebar'
 import { LANGUAGE } from '@/enum/language'
 import { ROUTES } from '@/enum/routes'
 import { getCurrentLanguage, getTranslations, setCurrentLanguage } from '@/lib/translation'
-import { useLogoutMutation, useTrackSessionQuery } from '@/queries/use-auth-query'
+import { useLogoutMutation, useProfileQuery, useTrackSessionQuery } from '@/queries/use-auth-query'
 
 const t = getTranslations()
 
+function profileInitials(name: string | undefined): string {
+  if (!name?.trim()) return ''
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return ''
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
+  const first = parts[0][0] ?? ''
+  const last = parts[parts.length - 1][0] ?? ''
+  return (first + last).toUpperCase()
+}
+
 export function SiteHeader() {
   useTrackSessionQuery()
+  const { data: profileResponse } = useProfileQuery()
   const navigate = useNavigate()
   const { mutateAsync: logout } = useLogoutMutation()
   const currentLanguage = getCurrentLanguage()
+  const user = profileResponse?.data
+  const avatarSrc = user?.image_url?.trim() ? user.image_url : undefined
+  const initials = profileInitials(user?.name)
 
   const handleLogout = async () => {
     await logout()
@@ -66,13 +80,25 @@ export function SiteHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="size-8">
-                <AvatarFallback>
-                  <User className="size-4" />
+                {avatarSrc ? <AvatarImage src={avatarSrc} alt={user?.name ?? ''} /> : null}
+                <AvatarFallback delayMs={avatarSrc ? 200 : 0}>
+                  {initials || <User className="size-4" />}
                 </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
+            {user ? (
+              <>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm font-medium leading-none">{user.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+              </>
+            ) : null}
             <DropdownMenuItem onClick={() => navigate({ to: ROUTES.SETTINGS as string })}>
               <Settings className="mr-2 size-4" />
               {t.header_settings()}

@@ -19,12 +19,6 @@ export type ILoginRequest = {
 } & Partial<IPasswordFormType> &
   Partial<IOTPFormType>
 
-export type ILoginResponse = {
-  accessToken: string
-  refreshToken: string
-  user: IUserProfile
-}
-
 export type IRegisterRequest = Omit<IRegisterFormType, 'confirmPassword'>
 
 export type IVerifyOTPRequest = IEmailFormType & IOTPFormType
@@ -44,6 +38,19 @@ export type IUserProfile = {
   active: boolean
   avatar: string
   activeOrganizationId: string
+}
+
+/** Profile payload from `GET /auth/profile` (snake_case, distinct from login `IUserProfile`). */
+export type IUserProfileDetail = {
+  id: string
+  name: string
+  email: string
+  status: string
+  created_at: string
+  updated_at: string
+  image_url: string
+  group_id: string | null
+  owned_groups: unknown[]
 }
 
 export type IRefreshTokenRequest = {
