@@ -1,3 +1,4 @@
+import { EventCategory } from '@/enum/event-category'
 import type { IEventListItem } from '@/interface/events'
 
 /** Test helper: builds `IEventListItem` datetimes from convenient `date` / `endDate` / `startTime` / `endTime` / `title` fields. */
@@ -21,7 +22,7 @@ export function makeEvent(overrides: MakeEventOverrides = {}): IEventListItem {
     start_time: overrides.start_time ?? `${startD} ${startTime}`,
     end_time: overrides.end_time ?? `${endD} ${endTime}`,
     priority: overrides.priority ?? 'high',
-    category: overrides.category ?? 'work',
+    category: overrides.category ?? EventCategory.BUSINESS,
   }
 }
 

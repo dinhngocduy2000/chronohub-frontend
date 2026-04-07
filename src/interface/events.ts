@@ -1,10 +1,13 @@
+import type { EventCategory } from '@/enum/event-category'
+
 export type IEventListItem = {
   id: string
   name: string
   start_time: string
   end_time: string
   priority: string
-  category: string
+  /** Backend `EventCategory` value; `string` allows unknown values without breaking the UI. */
+  category: EventCategory | string
 }
 
 export type IEventCalendarRequest = {

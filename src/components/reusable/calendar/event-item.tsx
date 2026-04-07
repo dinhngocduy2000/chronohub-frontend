@@ -3,7 +3,7 @@
 import { Link } from '@tanstack/react-router'
 import type { IEventListItem } from '@/interface/events'
 import { formatTime } from '@/lib/calendar-utils'
-import { getCategoryColor } from '@/lib/sample-events'
+import { getCategoryColor } from '@/lib/event-category'
 
 interface EventItemProps {
   event: IEventListItem

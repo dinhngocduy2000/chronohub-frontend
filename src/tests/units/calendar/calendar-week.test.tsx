@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { getCategoryColor } from '@/lib/event-category'
 import { makeEvent, WEEK_DAYS } from '@/tests/test-utils'
 import { CalendarWeek } from '../../../components/reusable/calendar/calendar-week'
 
@@ -86,11 +87,11 @@ describe('CalendarWeek', () => {
       render(
         <CalendarWeek
           currentDate={wedFeb12}
-          events={[makeEvent({ title: 'Colored', date: '2025-02-10', category: 'deadline' })]}
+          events={[makeEvent({ title: 'Colored', date: '2025-02-10', category: 'business' })]}
         />,
       )
       const block = screen.getByText('Colored').closest('div[style]')
-      expect(block).toHaveStyle({ backgroundColor: '#D62828' })
+      expect(block).toHaveStyle({ backgroundColor: getCategoryColor('business') })
     })
   })
 
