@@ -13,7 +13,7 @@ import {
   isToday,
   parseDateString,
 } from '@/lib/calendar-utils'
-import { getCategoryColor } from '@/lib/sample-events'
+import { getCategoryColor } from '@/lib/event-category'
 import { cn } from '@/lib/utils'
 import { EventItem } from './event-item'
 

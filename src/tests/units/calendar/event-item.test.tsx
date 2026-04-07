@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { getCategoryColor } from '@/lib/sample-events'
+import { getCategoryColor } from '@/lib/event-category'
 import { makeEvent } from '@/tests/test-utils'
 import { EventItem } from '../../../components/reusable/calendar/event-item'
 
@@ -19,7 +19,7 @@ describe('EventItem', () => {
     date: '2025-02-03',
     startTime: '09:00',
     endTime: '09:30',
-    category: 'meeting',
+    category: 'business',
   })
 
   it('renders event name and formatted start time', () => {
@@ -31,7 +31,7 @@ describe('EventItem', () => {
   it('applies category color as background', () => {
     render(<EventItem event={event} />)
     const block = screen.getByTitle('Team Standup')
-    expect(block).toHaveStyle({ backgroundColor: getCategoryColor('meeting') })
+    expect(block).toHaveStyle({ backgroundColor: getCategoryColor('business') })
   })
 
   it('links to the event detail page', () => {

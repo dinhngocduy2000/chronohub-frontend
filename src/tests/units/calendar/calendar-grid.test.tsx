@@ -12,25 +12,26 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 describe('CalendarGrid', () => {
-  const feb2025 = new Date(2025, 1, 1)
+  /** Fixed month so event dates (`2025-02-*`) align with the grid (not the machine clock). */
+  const February2025 = new Date(2025, 1, 1)
 
   describe('rendering', () => {
     it('renders all 7 weekday headers', () => {
-      render(<CalendarGrid currentDate={feb2025} events={[]} />)
+      render(<CalendarGrid currentDate={February2025} events={[]} />)
       for (const day of WEEK_DAYS) {
         expect(screen.getByText(day)).toBeInTheDocument()
       }
     })
 
     it('renders every day of February 2025 (1 through 28)', () => {
-      render(<CalendarGrid currentDate={feb2025} events={[]} />)
+      render(<CalendarGrid currentDate={February2025} events={[]} />)
       for (let d = 1; d <= 28; d++) {
         expect(screen.getByText(String(d))).toBeInTheDocument()
       }
     })
 
     it('does not render day 29 in a non-leap February', () => {
-      render(<CalendarGrid currentDate={feb2025} events={[]} />)
+      render(<CalendarGrid currentDate={February2025} events={[]} />)
       expect(screen.queryByText('29')).not.toBeInTheDocument()
     })
 
@@ -44,7 +45,7 @@ describe('CalendarGrid', () => {
     it('displays an event on its date', () => {
       render(
         <CalendarGrid
-          currentDate={feb2025}
+          currentDate={February2025}
           events={[makeEvent({ title: 'Morning Meeting', date: '2025-02-10' })]}
         />,
       )
@@ -56,7 +57,7 @@ describe('CalendarGrid', () => {
         makeEvent({ id: '1', title: 'Event A', date: '2025-02-10' }),
         makeEvent({ id: '2', title: 'Event B', date: '2025-02-10' }),
       ]
-      render(<CalendarGrid currentDate={feb2025} events={events} />)
+      render(<CalendarGrid currentDate={February2025} events={events} />)
       expect(screen.getByText('Event A')).toBeInTheDocument()
       expect(screen.getByText('Event B')).toBeInTheDocument()
     })
@@ -65,7 +66,7 @@ describe('CalendarGrid', () => {
       const events = Array.from({ length: 5 }, (_, i) =>
         makeEvent({ id: String(i), title: `E${i}`, date: '2025-02-10' }),
       )
-      render(<CalendarGrid currentDate={feb2025} events={events} />)
+      render(<CalendarGrid currentDate={February2025} events={events} />)
       expect(screen.getByText('+2 more')).toBeInTheDocument()
     })
 
@@ -73,14 +74,14 @@ describe('CalendarGrid', () => {
       const events = Array.from({ length: 3 }, (_, i) =>
         makeEvent({ id: String(i), title: `E${i}`, date: '2025-02-10' }),
       )
-      render(<CalendarGrid currentDate={feb2025} events={events} />)
+      render(<CalendarGrid currentDate={February2025} events={events} />)
       expect(screen.queryByText(/more/)).not.toBeInTheDocument()
     })
 
     it('ignores events that belong to a different month', () => {
       render(
         <CalendarGrid
-          currentDate={feb2025}
+          currentDate={February2025}
           events={[makeEvent({ title: 'March Event', date: '2025-03-05' })]}
         />,
       )
@@ -93,13 +94,13 @@ describe('CalendarGrid', () => {
       const events = [
         makeEvent({ id: '12', title: 'Offsite', date: '2025-02-18', endDate: '2025-02-20' }),
       ]
-      render(<CalendarGrid currentDate={feb2025} events={events} />)
+      render(<CalendarGrid currentDate={February2025} events={events} />)
       expect(screen.getByText('Offsite')).toBeInTheDocument()
     })
 
     it('does not render multi-day events outside the displayed month', () => {
       const events = [makeEvent({ title: 'March Trip', date: '2025-03-01', endDate: '2025-03-05' })]
-      render(<CalendarGrid currentDate={feb2025} events={events} />)
+      render(<CalendarGrid currentDate={February2025} events={events} />)
       expect(screen.queryByText('March Trip')).not.toBeInTheDocument()
     })
   })
@@ -107,7 +108,7 @@ describe('CalendarGrid', () => {
   describe('event links', () => {
     it('links each event to /events/:id', () => {
       const events = [makeEvent({ id: 'abc-123', title: 'Linked', date: '2025-02-10' })]
-      render(<CalendarGrid currentDate={feb2025} events={events} />)
+      render(<CalendarGrid currentDate={February2025} events={events} />)
 
       const link = screen
         .getAllByRole('link')
@@ -119,7 +120,7 @@ describe('CalendarGrid', () => {
       const events = [
         makeEvent({ id: 'multi-1', title: 'Multi', date: '2025-02-18', endDate: '2025-02-20' }),
       ]
-      render(<CalendarGrid currentDate={feb2025} events={events} />)
+      render(<CalendarGrid currentDate={February2025} events={events} />)
 
       const link = screen
         .getAllByRole('link')

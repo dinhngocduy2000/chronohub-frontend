@@ -3,7 +3,9 @@ import { useCallback, useState } from 'react'
 type ViewType = 'month' | 'week'
 
 export function useCalendar() {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 1)) // February 2025
+  const [currentDate, setCurrentDate] = useState(
+    new Date(new Date().getFullYear(), new Date().getMonth()),
+  ) // today's month
   const [view, setView] = useState<ViewType>('month')
 
   const navigatePrevious = useCallback(() => {
