@@ -4,6 +4,7 @@ import { createRouter, RouterProvider } from '@tanstack/react-router'
 import ReactDOM from 'react-dom/client'
 import { Provider as ReduxProvider } from 'react-redux'
 import { RouteLoadingFallback } from './components/layouts/RouteLoadingFallback'
+import { Toaster } from './components/ui/sonner'
 import { queryClient } from './queries'
 import { routeTree } from './routeTree.gen'
 import { store } from './stores'
@@ -33,6 +34,7 @@ if (rootElement && !rootElement.innerHTML) {
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
         <ReactQueryDevtools initialIsOpen={false} />
+        <Toaster richColors position="top-right" />
       </QueryClientProvider>
     </ReduxProvider>,
   )

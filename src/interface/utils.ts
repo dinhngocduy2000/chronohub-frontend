@@ -9,3 +9,8 @@ export type IMutation<ResponseType = unknown, VariableType = unknown> = {
   onMutate?: VoidFunction
   signal?: AbortSignal
 }
+
+export type IOption = {
+  label: string
+  value: string
+}

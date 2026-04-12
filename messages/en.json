@@ -63,5 +63,12 @@
   "header_subscriptions": "Subscriptions",
   "header_language": "Language",
   "header_language_en": "English",
-  "header_language_vi": "Vietnamese"
+  "header_language_vi": "Vietnamese",
+  "validation_group_name_required": "Group name is required",
+  "validation_group_name_max_length": "Group name must be at most 50 characters",
+  "validation_group_description_max_length": "Description must be at most 250 characters",
+  "create_group_welcome_title": "Welcome to ChronoHub!",
+  "create_group_welcome_description": "To get started, create a group. A group helps you organize events and collaborate with others.",
+  "create_group_success": "Group created successfully!",
+  "create_group_error": "Failed to create group. Please try again."
 }
