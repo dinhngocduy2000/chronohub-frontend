@@ -1,0 +1,328 @@
+import { expect, type Page, test } from '@playwright/test'
+import groupData from './data/group.json' with { type: 'json' }
+import profileData from './data/profile.json' with { type: 'json' }
+
+const HOME_URL = '/'
+const API_PROFILE = '**/api/v1/auth/profile'
+const API_TRACK_SESSION = '**/api/v1/auth/track'
+const API_CREATE_GROUP = '**/api/v1/groups/create'
+const API_EVENTS = '**/api/v1/events**'
+
+const VALID_GROUP_NAME = 'My New Group'
+const VALID_DESCRIPTION = 'A group for organizing events'
+
+async function setupAuthenticatedPage(page: Page, profileResponse: unknown) {
+  await page.addInitScript(() => {
+    localStorage.setItem('is_logged_in', 'true')
+  })
+
+  await page.route(API_TRACK_SESSION, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: null, message: 'OK', statusCode: 200 }),
+    }),
+  )
+
+  await page.route(API_PROFILE, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(profileResponse),
+    }),
+  )
+
+  await page.route(API_EVENTS, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: [], message: 'OK', statusCode: 200 }),
+    }),
+  )
+}
+
+test.describe('Create group dialog', () => {
+  test.describe('dialog visibility', () => {
+    test('shows dialog when user status is PENDING', async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.pendingUser)
+      await page.goto(HOME_URL)
+
+      await expect(page.getByText('Welcome to ChronoHub!')).toBeVisible()
+      await expect(
+        page.getByText(
+          'To get started, create a group. A group helps you organize events and collaborate with others.',
+        ),
+      ).toBeVisible()
+    })
+
+    test('does not show dialog when user status is ACTIVE', async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.activeUser)
+      await page.goto(HOME_URL)
+
+      await expect(page.getByText('Welcome to ChronoHub!')).not.toBeVisible()
+    })
+
+    test('dialog cannot be dismissed by clicking overlay', async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.pendingUser)
+      await page.goto(HOME_URL)
+
+      await expect(page.getByText('Welcome to ChronoHub!')).toBeVisible()
+
+      await page
+        .locator('[data-slot="dialog-overlay"]')
+        .click({ position: { x: 10, y: 10 }, force: true })
+
+      await expect(page.getByText('Welcome to ChronoHub!')).toBeVisible()
+    })
+
+    test('dialog does not have a Cancel button visible', async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.pendingUser)
+      await page.goto(HOME_URL)
+
+      await expect(page.getByText('Welcome to ChronoHub!')).toBeVisible()
+      await expect(page.getByRole('button', { name: /cancel/i })).not.toBeVisible()
+    })
+
+    test('dialog does not have a close (X) button', async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.pendingUser)
+      await page.goto(HOME_URL)
+
+      await expect(page.getByText('Welcome to ChronoHub!')).toBeVisible()
+      await expect(page.getByRole('button', { name: /close/i })).not.toBeVisible()
+    })
+  })
+
+  test.describe('form rendering', () => {
+    test.beforeEach(async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.pendingUser)
+      await page.goto(HOME_URL)
+    })
+
+    test('displays the app logo', async ({ page }) => {
+      await expect(page.locator('svg').first()).toBeVisible()
+    })
+
+    test('displays Name and Description fields', async ({ page }) => {
+      await expect(page.getByLabel(/name/i)).toBeVisible()
+      await expect(page.getByLabel(/description/i)).toBeVisible()
+    })
+
+    test('displays "Get Started" submit button', async ({ page }) => {
+      await expect(page.getByRole('button', { name: /get started/i })).toBeVisible()
+    })
+
+    test('"Get Started" button is disabled when form is empty', async ({ page }) => {
+      await expect(page.getByRole('button', { name: /get started/i })).toBeDisabled()
+    })
+  })
+
+  test.describe('form validation', () => {
+    test.beforeEach(async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.pendingUser)
+      await page.goto(HOME_URL)
+    })
+
+    test('shows error when name is cleared after input', async ({ page }) => {
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+      await page.getByLabel(/name/i).clear()
+      await page.getByLabel(/description/i).click()
+
+      await expect(page.getByText(/group name is required/i)).toBeVisible()
+    })
+
+    test('shows error when name exceeds 50 characters', async ({ page }) => {
+      const longName = 'a'.repeat(51)
+      await page.getByLabel(/name/i).fill(longName)
+      await page.getByLabel(/description/i).click()
+
+      await expect(page.getByText(/group name must be at most 50 characters/i)).toBeVisible()
+    })
+
+    test('shows error when description exceeds 250 characters', async ({ page }) => {
+      const longDescription = 'a'.repeat(251)
+      await page.getByLabel(/description/i).fill(longDescription)
+      await page.getByLabel(/name/i).click()
+
+      await expect(page.getByText(/description must be at most 250 characters/i)).toBeVisible()
+    })
+
+    test('"Get Started" button becomes enabled with valid name', async ({ page }) => {
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+
+      await expect(page.getByRole('button', { name: /get started/i })).toBeEnabled()
+    })
+
+    test('"Get Started" button is enabled with name only (description optional)', async ({
+      page,
+    }) => {
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+
+      await expect(page.getByRole('button', { name: /get started/i })).toBeEnabled()
+      await expect(page.getByLabel(/description/i)).toHaveValue('')
+    })
+  })
+
+  test.describe('form submission', () => {
+    test.beforeEach(async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.pendingUser)
+      await page.goto(HOME_URL)
+    })
+
+    test('sends correct payload on successful submission', async ({ page }) => {
+      let capturedBody: Record<string, unknown> | null = null
+
+      await page.route(API_CREATE_GROUP, async (route) => {
+        capturedBody = route.request().postDataJSON()
+        await route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify(groupData.createGroupSuccess),
+        })
+      })
+
+      await page.route(API_PROFILE, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(profileData.activeUser),
+        })
+      })
+
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+      await page.getByLabel(/description/i).fill(VALID_DESCRIPTION)
+
+      const responsePromise = page.waitForResponse(API_CREATE_GROUP)
+      await page.getByRole('button', { name: /get started/i }).click()
+      await responsePromise
+
+      expect(capturedBody).toMatchObject({
+        name: VALID_GROUP_NAME,
+        description: VALID_DESCRIPTION,
+      })
+    })
+
+    test('sends null description when description is empty', async ({ page }) => {
+      let capturedBody: Record<string, unknown> | null = null
+
+      await page.route(API_CREATE_GROUP, async (route) => {
+        capturedBody = route.request().postDataJSON()
+        await route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify(groupData.createGroupSuccess),
+        })
+      })
+
+      await page.route(API_PROFILE, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(profileData.activeUser),
+        })
+      })
+
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+
+      const responsePromise = page.waitForResponse(API_CREATE_GROUP)
+      await page.getByRole('button', { name: /get started/i }).click()
+      await responsePromise
+
+      expect(capturedBody).toMatchObject({
+        name: VALID_GROUP_NAME,
+        description: null,
+      })
+    })
+
+    test('shows success toast on successful group creation', async ({ page }) => {
+      await page.route(API_CREATE_GROUP, (route) =>
+        route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify(groupData.createGroupSuccess),
+        }),
+      )
+
+      await page.route(API_PROFILE, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(profileData.activeUser),
+        })
+      })
+
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+      await page.getByRole('button', { name: /get started/i }).click()
+
+      await expect(page.getByText('Group created successfully!')).toBeVisible()
+    })
+
+    test('closes dialog after successful submission', async ({ page }) => {
+      await page.route(API_CREATE_GROUP, (route) =>
+        route.fulfill({
+          status: 201,
+          contentType: 'application/json',
+          body: JSON.stringify(groupData.createGroupSuccess),
+        }),
+      )
+
+      await page.route(API_PROFILE, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(profileData.activeUser),
+        })
+      })
+
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+      await page.getByRole('button', { name: /get started/i }).click()
+
+      await expect(page.getByText('Welcome to ChronoHub!')).not.toBeVisible({ timeout: 5000 })
+    })
+
+    test('shows server error toast on failed submission', async ({ page }) => {
+      await page.route(API_CREATE_GROUP, (route) =>
+        route.fulfill({
+          status: 400,
+          contentType: 'application/json',
+          body: JSON.stringify(groupData.createGroupError),
+        }),
+      )
+
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+      await page.getByRole('button', { name: /get started/i }).click()
+
+      await expect(page.getByText('A group with this name already exists')).toBeVisible()
+    })
+
+    test('shows fallback error toast when server returns no detail', async ({ page }) => {
+      await page.route(API_CREATE_GROUP, (route) =>
+        route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({}),
+        }),
+      )
+
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+      await page.getByRole('button', { name: /get started/i }).click()
+
+      await expect(page.getByText('Failed to create group. Please try again.')).toBeVisible()
+    })
+
+    test('dialog remains open after failed submission', async ({ page }) => {
+      await page.route(API_CREATE_GROUP, (route) =>
+        route.fulfill({
+          status: 400,
+          contentType: 'application/json',
+          body: JSON.stringify(groupData.createGroupError),
+        }),
+      )
+
+      await page.getByLabel(/name/i).fill(VALID_GROUP_NAME)
+      await page.getByRole('button', { name: /get started/i }).click()
+
+      await expect(page.getByText('Welcome to ChronoHub!')).toBeVisible()
+      await expect(page.getByLabel(/name/i)).toBeVisible()
+    })
+  })
+})
