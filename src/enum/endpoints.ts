@@ -12,6 +12,10 @@ export enum AUTH_ENDPOINTS {
   GOOGLE_LOGIN_URL = '/auth/google',
 }
 
+export enum GROUPS_ENDPOINTS {
+  CREATE = '/groups/create',
+}
+
 export enum EVENTS_ENDPOINTS {
   /** `GET` — query: `IEventCalendarRequest`; resolves to `{baseURL}/v1/events` when `baseURL` ends with `/api`. */
   EVENT_CALENDAR = '/events',

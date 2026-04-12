@@ -1,140 +1,68 @@
-import { useNavigate } from '@tanstack/react-router'
-import { Bell, Check, CreditCard, Globe, LogOut, Settings, User } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { useCallback, useRef, useState } from 'react'
+import AppDialogComponent from '@/components/reusable/app-dialog/app-dialog-component'
+import CreateGroupForm, {
+  type CreateGroupFormHandle,
+} from '@/components/reusable/create-group-dialog/create-group-dialog'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { LANGUAGE } from '@/enum/language'
-import { ROUTES } from '@/enum/routes'
-import { getCurrentLanguage, getTranslations, setCurrentLanguage } from '@/lib/translation'
-import { useLogoutMutation, useProfileQuery, useTrackSessionQuery } from '@/queries/use-auth-query'
+import { UserStatus } from '@/enum/users'
+import { getTranslations } from '@/lib/translation'
+import { useProfileQuery, useTrackSessionQuery } from '@/queries/use-auth-query'
+import { ProfileDropdownComponent } from './ProfileDropdownComponent'
 
 const t = getTranslations()
-
-function profileInitials(name: string | undefined): string {
-  if (!name?.trim()) return ''
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  if (parts.length === 0) return ''
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  const first = parts[0][0] ?? ''
-  const last = parts[parts.length - 1][0] ?? ''
-  return (first + last).toUpperCase()
-}
 
 export function SiteHeader() {
   useTrackSessionQuery()
   const { data: profileResponse } = useProfileQuery()
-  const navigate = useNavigate()
-  const { mutateAsync: logout } = useLogoutMutation()
-  const currentLanguage = getCurrentLanguage()
   const user = profileResponse?.data
-  const avatarSrc = user?.image_url?.trim() ? user.image_url : undefined
-  const initials = profileInitials(user?.name)
+  const showCreateGroupDialog = profileResponse?.data?.status === UserStatus.PENDING
+  const [dialogOpen, setDialogOpen] = useState(showCreateGroupDialog)
+  const formRef = useRef<CreateGroupFormHandle>(null)
+  const isFormDirtyRef = useRef(false)
+  const [formState, setFormState] = useState({ isValid: false, isPending: false, isDirty: false })
 
-  const handleLogout = async () => {
-    await logout()
-  }
-
-  const handleLanguageChange = (language: LANGUAGE) => {
-    setCurrentLanguage(language)
-    window.location.reload()
-  }
+  const handleFormStateChange = useCallback(
+    (state: { isValid: boolean; isPending: boolean; isDirty: boolean }) => {
+      isFormDirtyRef.current = state.isDirty
+      setFormState(state)
+    },
+    [],
+  )
 
   return (
-    <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
-      <SidebarTrigger className="-ml-1" />
-      <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+    <>
+      <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
 
-      <span className="text-lg font-semibold">{t.app_name()}</span>
+        <span className="text-lg font-semibold">{t.app_name()}</span>
 
-      <div className="ml-auto flex items-center gap-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="size-5" />
-              <span className="sr-only">{t.header_notifications()}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64">
-            <DropdownMenuLabel>{t.header_notifications()}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="p-4 text-center text-sm text-muted-foreground">
-              {t.header_no_notifications()}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ProfileDropdownComponent user={user} />
+      </header>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Avatar className="size-8">
-                {avatarSrc ? <AvatarImage src={avatarSrc} alt={user?.name ?? ''} /> : null}
-                <AvatarFallback delayMs={avatarSrc ? 200 : 0}>
-                  {initials || <User className="size-4" />}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            {user ? (
-              <>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm font-medium leading-none">{user.name}</p>
-                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-              </>
-            ) : null}
-            <DropdownMenuItem onClick={() => navigate({ to: ROUTES.SETTINGS as string })}>
-              <Settings className="mr-2 size-4" />
-              {t.header_settings()}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate({ to: ROUTES.SUBSCRIPTIONS as string })}>
-              <CreditCard className="mr-2 size-4" />
-              {t.header_subscriptions()}
-            </DropdownMenuItem>
-
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Globe className="mr-2 size-4" />
-                {t.header_language()}
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  <DropdownMenuItem onClick={() => handleLanguageChange(LANGUAGE.EN)}>
-                    {t.header_language_en()}
-                    {currentLanguage === LANGUAGE.EN && <Check className="ml-auto size-4" />}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange(LANGUAGE.VI)}>
-                    {t.header_language_vi()}
-                    {currentLanguage === LANGUAGE.VI && <Check className="ml-auto size-4" />}
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 size-4" />
-              {t.header_logout()}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </header>
+      <AppDialogComponent
+        open={dialogOpen || showCreateGroupDialog}
+        setOpen={setDialogOpen}
+        dialogTrigger={null}
+        header={false}
+        confirmButtonText="Get Started"
+        confirmButtonProps={{
+          disabled: !formState.isValid || formState.isPending,
+          loading: formState.isPending,
+          className: 'w-full',
+        }}
+        cancelButtonProps={{ className: 'hidden' }}
+        onConfirm={() => formRef.current?.submit()}
+        isFormDirtyRef={isFormDirtyRef}
+        disableClickOverlay
+      >
+        <CreateGroupForm
+          ref={formRef}
+          closeModal={() => setDialogOpen(false)}
+          onFormStateChange={handleFormStateChange}
+        />
+      </AppDialogComponent>
+    </>
   )
 }

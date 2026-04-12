@@ -23,7 +23,7 @@ function HomePage() {
     [currentDate, groupId],
   )
 
-  const { data: calendarResponse, isLoading, isError } = useEventsCalendarQuery(calendarParams)
+  const { data: calendarResponse, isLoading } = useEventsCalendarQuery(calendarParams)
 
   const allEvents = useMemo(() => {
     const rows = calendarResponse?.data ?? []
@@ -41,12 +41,6 @@ function HomePage() {
           onToday={goToToday}
           onViewChange={changeView}
         />
-
-        {isError && (
-          <p className="text-sm text-destructive px-4 py-3" role="alert">
-            Could not load events. Try again later.
-          </p>
-        )}
 
         {isLoading && groupId ? (
           <p className="text-sm text-muted-foreground px-4 py-6 text-center">Loading events…</p>

@@ -1,4 +1,5 @@
 import type z from 'zod'
+import type { UserStatusType } from '@/enum/users'
 import type {
   createEmailSchemas,
   createLoginFormSchemas,
@@ -6,6 +7,7 @@ import type {
   createPasswordSchemas,
   createRegisterFormSchemas,
 } from '@/schemas/auth-schemas'
+import type { IGroupInfo } from './groups'
 
 export type IEmailFormType = z.infer<ReturnType<typeof createEmailSchemas>>
 export type IPasswordFormType = z.infer<ReturnType<typeof createPasswordSchemas>>
@@ -28,29 +30,17 @@ export type IVerifyGoogleCodeRequest = {
   redirectUri: string
 }
 
-export type IUserProfile = {
-  id: string
-  createdAt: string
-  updatedAt: string
-  deletedAt?: string
-  email: string
-  fullName: string
-  active: boolean
-  avatar: string
-  activeOrganizationId: string
-}
-
 /** Profile payload from `GET /auth/profile` (snake_case, distinct from login `IUserProfile`). */
 export type IUserProfileDetail = {
   id: string
   name: string
   email: string
-  status: string
+  status: UserStatusType
   created_at: string
   updated_at: string
   image_url: string
-  group_id: string | null
-  owned_groups: unknown[]
+  group_id?: string | null
+  owned_groups: IGroupInfo[]
 }
 
 export type IRefreshTokenRequest = {

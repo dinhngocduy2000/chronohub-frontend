@@ -63,5 +63,12 @@
   "header_subscriptions": "Gói đăng ký",
   "header_language": "Ngôn ngữ",
   "header_language_en": "Tiếng Anh",
-  "header_language_vi": "Tiếng Việt"
+  "header_language_vi": "Tiếng Việt",
+  "validation_group_name_required": "Tên nhóm là bắt buộc",
+  "validation_group_name_max_length": "Tên nhóm tối đa 50 ký tự",
+  "validation_group_description_max_length": "Mô tả tối đa 250 ký tự",
+  "create_group_welcome_title": "Chào mừng đến với ChronoHub!",
+  "create_group_welcome_description": "Để bắt đầu, hãy tạo một nhóm. Nhóm giúp bạn tổ chức sự kiện và cộng tác với mọi người.",
+  "create_group_success": "Tạo nhóm thành công!",
+  "create_group_error": "Tạo nhóm thất bại. Vui lòng thử lại."
 }
