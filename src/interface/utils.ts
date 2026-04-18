@@ -13,4 +13,6 @@ export type IMutation<ResponseType = unknown, VariableType = unknown> = {
 export type IOption = {
   label: string
   value: string
+  subLabel?: string
+  icon?: React.ReactNode
 }
