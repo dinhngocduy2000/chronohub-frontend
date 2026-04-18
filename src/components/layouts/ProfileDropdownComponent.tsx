@@ -1,5 +1,14 @@
 import { useNavigate } from '@tanstack/react-router'
-import { Bell, Check, CreditCard, Globe, LogOut, Settings, User } from 'lucide-react'
+import {
+  Bell,
+  Check,
+  CreditCard,
+  Globe,
+  LogOut,
+  type LucideIcon,
+  Settings,
+  User,
+} from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +28,17 @@ import { ROUTES } from '@/enum/routes'
 import type { IUserProfileDetail } from '@/interface/auth'
 import { getCurrentLanguage, getTranslations, setCurrentLanguage } from '@/lib/translation'
 import { useLogoutMutation } from '@/queries/use-auth-query'
+import { TypographyP, TypographySmall } from '../ui/typography'
+
+type MenuItemEntry = { type: 'item'; icon: LucideIcon; label: string; onClick: () => void }
+type MenuSeparator = { type: 'separator'; key: string }
+type MenuSubEntry = {
+  type: 'sub'
+  icon: LucideIcon
+  label: string
+  items: { label: string; onClick: () => void; active: boolean }[]
+}
+type MenuEntry = MenuItemEntry | MenuSeparator | MenuSubEntry
 
 const t = getTranslations()
 
@@ -48,6 +68,40 @@ export function ProfileDropdownComponent({ user }: { user?: IUserProfileDetail }
     setCurrentLanguage(language)
     window.location.reload()
   }
+
+  const menuItems: MenuEntry[] = [
+    {
+      type: 'item',
+      icon: Settings,
+      label: t.header_settings(),
+      onClick: () => navigate({ to: ROUTES.SETTINGS as string }),
+    },
+    {
+      type: 'item',
+      icon: CreditCard,
+      label: t.header_subscriptions(),
+      onClick: () => navigate({ to: ROUTES.SUBSCRIPTIONS as string }),
+    },
+    {
+      type: 'sub',
+      icon: Globe,
+      label: t.header_language(),
+      items: [
+        {
+          label: t.header_language_en(),
+          onClick: () => handleLanguageChange(LANGUAGE.EN),
+          active: currentLanguage === LANGUAGE.EN,
+        },
+        {
+          label: t.header_language_vi(),
+          onClick: () => handleLanguageChange(LANGUAGE.VI),
+          active: currentLanguage === LANGUAGE.VI,
+        },
+      ],
+    },
+    { type: 'separator', key: 'logout-separator' },
+    { type: 'item', icon: LogOut, label: t.header_logout(), onClick: handleLogout },
+  ]
 
   return (
     <div className="ml-auto flex items-center gap-2">
@@ -81,48 +135,62 @@ export function ProfileDropdownComponent({ user }: { user?: IUserProfileDetail }
         <DropdownMenuContent align="end" className="w-56">
           {user ? (
             <>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium leading-none">{user.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+              <DropdownMenuItem>
+                <Avatar className="size-6">
+                  {avatarSrc ? <AvatarImage src={avatarSrc} alt={user?.name ?? ''} /> : null}
+                  <AvatarFallback delayMs={avatarSrc ? 200 : 0}>
+                    {initials || <User className="size-4" />}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col gap-1 truncate">
+                  <TypographyP className="text-sm font-medium leading-none">
+                    {user.name}
+                  </TypographyP>
+                  <TypographySmall
+                    title={user.email}
+                    className="text-xs mt-0! leading-none text-muted-foreground truncate"
+                  >
+                    {user.email}
+                  </TypographySmall>
                 </div>
-              </DropdownMenuLabel>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
             </>
           ) : null}
-          <DropdownMenuItem onClick={() => navigate({ to: ROUTES.SETTINGS as string })}>
-            <Settings className="mr-2 size-4" />
-            {t.header_settings()}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate({ to: ROUTES.SUBSCRIPTIONS as string })}>
-            <CreditCard className="mr-2 size-4" />
-            {t.header_subscriptions()}
-          </DropdownMenuItem>
 
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <Globe className="mr-2 size-4" />
-              {t.header_language()}
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem onClick={() => handleLanguageChange(LANGUAGE.EN)}>
-                  {t.header_language_en()}
-                  {currentLanguage === LANGUAGE.EN && <Check className="ml-auto size-4" />}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleLanguageChange(LANGUAGE.VI)}>
-                  {t.header_language_vi()}
-                  {currentLanguage === LANGUAGE.VI && <Check className="ml-auto size-4" />}
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
+          {menuItems.map((entry) => {
+            if (entry.type === 'separator') {
+              return <DropdownMenuSeparator key={entry.key} />
+            }
 
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>
-            <LogOut className="mr-2 size-4" />
-            {t.header_logout()}
-          </DropdownMenuItem>
+            if (entry.type === 'sub') {
+              return (
+                <DropdownMenuSub key={entry.label}>
+                  <DropdownMenuSubTrigger>
+                    <entry.icon className="mr-2 size-4" />
+                    {entry.label}
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      {entry.items.map((subItem) => (
+                        <DropdownMenuItem key={subItem.label} onClick={subItem.onClick}>
+                          {subItem.label}
+                          {subItem.active && <Check className="ml-auto size-4" />}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+              )
+            }
+
+            return (
+              <DropdownMenuItem key={entry.label} onClick={entry.onClick}>
+                <entry.icon className="mr-2 size-4" />
+                {entry.label}
+              </DropdownMenuItem>
+            )
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
