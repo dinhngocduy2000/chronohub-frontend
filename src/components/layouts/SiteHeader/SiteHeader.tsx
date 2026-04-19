@@ -1,16 +1,16 @@
 import { useCallback, useRef, useState } from 'react'
-import AppDialogComponent from '@/components/reusable/app-dialog/app-dialog-component'
-import { AppSelectComponent } from '@/components/reusable/app-select-component/app-select-component'
 import CreateGroupForm, {
   type CreateGroupFormHandle,
-} from '@/components/reusable/create-group-dialog/create-group-dialog'
+} from '@/components/layouts/SiteHeader/create-group-dialog/create-group-dialog'
+import AppDialogComponent from '@/components/reusable/app-dialog/app-dialog-component'
+import { AppSelectComponent } from '@/components/reusable/app-select-component/app-select-component'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { UserStatus } from '@/enum/users'
 import type { IOption } from '@/interface/utils'
 import { getTranslations } from '@/lib/translation'
 import { useProfileQuery, useTrackSessionQuery } from '@/queries/use-auth-query'
-import { ProfileDropdownComponent } from './ProfileDropdownComponent'
+import { ProfileDropdownComponent } from '../ProfileDropdownComponent'
 
 const InitialIcon = ({ label }: { label: string }) => (
   <span className="flex size-5 items-center justify-center rounded-md bg-[#bf360b] text-[10px] font-semibold text-primary-foreground">

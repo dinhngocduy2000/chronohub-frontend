@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from './AppSidebar'
-import { SiteHeader } from './SiteHeader'
+import { SiteHeader } from './SiteHeader/SiteHeader'
 
 interface AuthLayoutProps {
   children: ReactNode
