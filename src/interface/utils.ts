@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 export type ReactQueryHookParams<T> = {
   queryKey?: unknown[]
   params: T
+  enabled?: boolean
 }
 
 export type IMutation<ResponseType = unknown, VariableType = unknown> = {

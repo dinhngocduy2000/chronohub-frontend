@@ -10,8 +10,8 @@ export const useCheckEmailExistenceQuery = ({
   ...params
 }: ReactQueryHookParams<IEmailFormType> & { enabled?: boolean }) => {
   return useQuery({
-    queryKey: [USERS_ENDPOINTS.CHECK_EMAIL_EXISTS, params.params.email, ...queryKey],
-    queryFn: async ({ signal }) => await checkEmailExists(params.params, signal),
+    queryKey: [USERS_ENDPOINTS.CHECK_EMAIL_EXISTS, params.params?.email, ...queryKey],
+    queryFn: async ({ signal }) => await checkEmailExists(params?.params, signal),
     enabled: enabled,
   })
 }

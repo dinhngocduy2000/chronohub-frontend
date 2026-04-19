@@ -14,6 +14,8 @@ export enum AUTH_ENDPOINTS {
 
 export enum GROUPS_ENDPOINTS {
   CREATE = '/groups/create',
+  LIST_KEY_VALUE = '/groups/key-value',
+  LIST_GROUP = '/groups',
 }
 
 export enum EVENTS_ENDPOINTS {

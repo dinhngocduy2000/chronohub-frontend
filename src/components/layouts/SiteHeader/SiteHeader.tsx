@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import CreateGroupForm, {
   type CreateGroupFormHandle,
 } from '@/components/layouts/SiteHeader/create-group-dialog/create-group-dialog'
@@ -10,27 +10,15 @@ import { UserStatus } from '@/enum/users'
 import type { IOption } from '@/interface/utils'
 import { getTranslations } from '@/lib/translation'
 import { useProfileQuery, useTrackSessionQuery } from '@/queries/use-auth-query'
+import { useListGroupKeyValueQuery } from '@/queries/use-groups-query'
 import { ProfileDropdownComponent } from '../ProfileDropdownComponent'
-
-const InitialIcon = ({ label }: { label: string }) => (
-  <span className="flex size-5 items-center justify-center rounded-md bg-[#bf360b] text-[10px] font-semibold text-primary-foreground">
-    {label.charAt(0).toUpperCase()}
-  </span>
-)
-
-const MOCK_OPTIONS: IOption[] = [
-  { label: 'Engineering', value: 'engineering', icon: <InitialIcon label="Engineering" /> },
-  { label: 'Design', value: 'design', icon: <InitialIcon label="Design" /> },
-  { label: 'Marketing', value: 'marketing', icon: <InitialIcon label="Marketing" /> },
-  { label: 'Sales', value: 'sales', icon: <InitialIcon label="Sales" /> },
-  { label: 'Support', value: 'support', icon: <InitialIcon label="Support" /> },
-]
 
 const t = getTranslations()
 
 export function SiteHeader() {
   useTrackSessionQuery()
   const { data: profileResponse } = useProfileQuery()
+  const { data: groupKeyValueListData } = useListGroupKeyValueQuery({ params: null })
   const user = profileResponse?.data
   const showCreateGroupDialog = profileResponse?.data?.status === UserStatus.PENDING
   const [dialogOpen, setDialogOpen] = useState(showCreateGroupDialog)
@@ -46,6 +34,10 @@ export function SiteHeader() {
     },
     [],
   )
+  const listGroupKeyValue = useMemo(
+    () => groupKeyValueListData?.data ?? [],
+    [groupKeyValueListData?.data],
+  )
 
   return (
     <>
@@ -56,7 +48,7 @@ export function SiteHeader() {
         <span className="text-lg font-semibold">{t.app_name()}</span>
 
         <AppSelectComponent
-          options={MOCK_OPTIONS.filter((option) =>
+          options={listGroupKeyValue.filter((option) =>
             option.label.toLowerCase().includes(searchValue.toLowerCase()),
           )}
           value={selectedTeam}
