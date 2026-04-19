@@ -33,6 +33,7 @@ export function useCreateGroupForm({
 
   const {
     formState: { isValid, isDirty },
+    handleSubmit,
   } = form
 
   const { mutateAsync, isPending } = useCreateGroupMutation({
@@ -56,12 +57,12 @@ export function useCreateGroupForm({
   }
 
   useImperativeHandle(ref, () => ({
-    submit: form.handleSubmit(onSubmit),
+    submit: handleSubmit(onSubmit),
   }))
 
   useEffect(() => {
     onFormStateChange?.({ isValid, isPending, isDirty })
   }, [isValid, isPending, isDirty, onFormStateChange])
 
-  return { form, onSubmit }
+  return { form, onSubmit, handleSubmit }
 }

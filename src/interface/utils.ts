@@ -1,6 +1,9 @@
+import type { ReactNode } from 'react'
+
 export type ReactQueryHookParams<T> = {
   queryKey?: unknown[]
   params: T
+  enabled?: boolean
 }
 
 export type IMutation<ResponseType = unknown, VariableType = unknown> = {
@@ -15,4 +18,18 @@ export type IOption = {
   value: string
   subLabel?: string
   icon?: React.ReactNode
+}
+
+export type IDropdownMenuProps = {
+  trigger?: string | ReactNode
+  items: IDropdownMenuItem[]
+  onSearch?: (value: string) => void
+  dropdownContentClassName?: string
+  contentAlign?: 'start' | 'end'
+  triggerVariant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+}
+export type IDropdownMenuItem = {
+  label: string | ReactNode
+  onClick: VoidFunction
+  disabled?: boolean
 }

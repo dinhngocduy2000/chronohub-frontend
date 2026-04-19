@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { TypographyH2, TypographyP } from '@/components/ui/typography'
 import { getTranslations } from '@/lib/translation'
 import { useCreateGroupForm } from './use-create-group-form'
 
@@ -30,18 +31,26 @@ export default function CreateGroupForm({
   closeModal,
   onFormStateChange,
 }: CreateGroupFormProps) {
-  const { form, onSubmit } = useCreateGroupForm({ ref, closeModal, onFormStateChange })
+  const { form, onSubmit, handleSubmit } = useCreateGroupForm({
+    ref,
+    closeModal,
+    onFormStateChange,
+  })
 
   return (
     <div className="flex flex-col gap-6 pt-6">
       <div className="flex flex-col items-center gap-3 text-center">
         <AppLogo className="size-16" />
-        <h2 className="text-xl font-semibold">{t.create_group_welcome_title()}</h2>
-        <p className="text-sm text-muted-foreground">{t.create_group_welcome_description()}</p>
+        <TypographyH2 className="text-xl font-semibold">
+          {t.create_group_welcome_title()}
+        </TypographyH2>
+        <TypographyP className="text-sm text-muted-foreground">
+          {t.create_group_welcome_description()}
+        </TypographyP>
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
           <FormField
             control={form.control}
             name="name"
