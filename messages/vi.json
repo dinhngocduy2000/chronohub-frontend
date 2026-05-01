@@ -70,5 +70,12 @@
   "create_group_welcome_title": "Chào mừng đến với ChronoHub!",
   "create_group_welcome_description": "Để bắt đầu, hãy tạo một nhóm. Nhóm giúp bạn tổ chức sự kiện và cộng tác với mọi người.",
   "create_group_success": "Tạo nhóm thành công!",
-  "create_group_error": "Tạo nhóm thất bại. Vui lòng thử lại."
+  "create_group_error": "Tạo nhóm thất bại. Vui lòng thử lại.",
+  "otp_required": "Mã OTP là bắt buộc",
+  "otp_incorrect": "Mã OTP không đúng",
+  "sent_code_text": "Chúng tôi đã gửi mã OTP đến",
+  "didnt_get_code_text": "Không nhận được mã OTP?",
+  "click_to_resend": "Nhấn để gửi lại",
+  "otp_button": "Xác nhận",
+  "otp_verified_success": "Mã OTP đã được xác nhận thành công"
 }

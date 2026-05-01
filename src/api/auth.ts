@@ -1,6 +1,11 @@
 import { AUTH_ENDPOINTS } from '@/enum/endpoints'
 import type { IResponseData } from '@/interface/api-response'
-import type { ILoginRequest, IRegisterRequest, IUserProfileDetail } from '@/interface/auth'
+import type {
+  ILoginRequest,
+  IRegisterRequest,
+  IUserProfileDetail,
+  IValidateOTPRequest,
+} from '@/interface/auth'
 import axiosConfig, { axiosConfigWithoutAuth } from '.'
 
 export const loginApi = async (data: ILoginRequest): Promise<string> => {
@@ -33,4 +38,10 @@ export const logoutAPI = async (): Promise<IResponseData<null>> => {
 
 export const getGoogleLoginURLAPI = async (): Promise<IResponseData<{ url: string }>> => {
   return await axiosConfigWithoutAuth.post(AUTH_ENDPOINTS.GOOGLE_LOGIN_URL)
+}
+
+export const validateOTPAPI = async (
+  data: IValidateOTPRequest,
+): Promise<IResponseData<unknown>> => {
+  return await axiosConfigWithoutAuth.post(AUTH_ENDPOINTS.VALIDATE_OTP, data)
 }

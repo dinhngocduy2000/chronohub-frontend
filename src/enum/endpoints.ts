@@ -10,6 +10,7 @@ export enum AUTH_ENDPOINTS {
   REFRESH_TOKEN = '/auth/refresh',
   LOGOUT = '/auth/logout',
   GOOGLE_LOGIN_URL = '/auth/google',
+  VALIDATE_OTP = '/auth/validate-otp',
 }
 
 export enum GROUPS_ENDPOINTS {

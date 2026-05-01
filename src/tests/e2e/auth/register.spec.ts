@@ -185,7 +185,7 @@ test.describe('Register page', () => {
       await page.getByTestId('confirm-password-input').fill(VALID_PASSWORD)
       await page.getByTestId('register-button').click()
 
-      await expect(page).toHaveURL('/login')
+      await expect(page).toHaveURL('/otp')
     })
 
     test('sends correct payload without confirmPassword', async ({ page }) => {

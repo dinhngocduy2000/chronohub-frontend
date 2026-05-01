@@ -84,3 +84,16 @@ export const createOtpSchemas = () => {
     ),
   })
 }
+
+export const otpSchemas = () => {
+  const t = getTranslations()
+  return z.object({
+    otp: z.preprocess(
+      toTrimmedString,
+      z
+        .string()
+        .min(1, { message: t.validation_otp_required() })
+        .min(6, { message: t.validation_otp_incorrect() }),
+    ),
+  })
+}

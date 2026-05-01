@@ -70,5 +70,12 @@
   "create_group_welcome_title": "Welcome to ChronoHub!",
   "create_group_welcome_description": "To get started, create a group. A group helps you organize events and collaborate with others.",
   "create_group_success": "Group created successfully!",
-  "create_group_error": "Failed to create group. Please try again."
+  "create_group_error": "Failed to create group. Please try again.",
+  "otp_required": "OTP is required",
+  "otp_incorrect": "OTP is incorrect",
+  "sent_code_text": "We've sent a code to",
+  "didnt_get_code_text": "Didn't get the code?",
+  "click_to_resend": "Click to resend",
+  "otp_button": "Verify",
+  "otp_verified_success": "OTP verified successfully"
 }

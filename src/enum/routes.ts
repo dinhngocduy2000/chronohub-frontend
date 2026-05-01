@@ -12,4 +12,5 @@ export enum ROUTES {
   ADMIN_FEEDBACK = '/admin/feedback',
   SETTINGS = '/settings',
   SUBSCRIPTIONS = '/subscriptions',
+  OTP = '/otp',
 }
