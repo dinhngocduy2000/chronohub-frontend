@@ -1,45 +1,12 @@
-import { expect, type Page, test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import { API_PROFILE, setupAuthenticatedPage } from '../utils/setup-authenticated'
 import groupData from './data/group.json' with { type: 'json' }
 import profileData from './data/profile.json' with { type: 'json' }
 
 const HOME_URL = '/'
-const API_PROFILE = '**/api/v1/auth/profile'
-const API_TRACK_SESSION = '**/api/v1/auth/track'
 const API_CREATE_GROUP = '**/api/v1/groups/create'
-const API_EVENTS = '**/api/v1/events**'
-
 const VALID_GROUP_NAME = 'My New Group'
 const VALID_DESCRIPTION = 'A group for organizing events'
-
-async function setupAuthenticatedPage(page: Page, profileResponse: unknown) {
-  await page.addInitScript(() => {
-    localStorage.setItem('is_logged_in', 'true')
-  })
-
-  await page.route(API_TRACK_SESSION, (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ data: null, message: 'OK', statusCode: 200 }),
-    }),
-  )
-
-  await page.route(API_PROFILE, (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify(profileResponse),
-    }),
-  )
-
-  await page.route(API_EVENTS, (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ data: [], message: 'OK', statusCode: 200 }),
-    }),
-  )
-}
 
 test.describe('Create group dialog', () => {
   test.describe('dialog visibility', () => {
@@ -55,9 +22,29 @@ test.describe('Create group dialog', () => {
       ).toBeVisible()
     })
 
+    test('shows dialog when user status is ACTIVE and user has no group', async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.activeUserWithNoGroup)
+      await page.goto(HOME_URL)
+
+      await page.waitForResponse(API_PROFILE)
+
+      await expect(page.getByText('Welcome to ChronoHub!')).toBeVisible()
+    })
+
     test('does not show dialog when user status is ACTIVE', async ({ page }) => {
       await setupAuthenticatedPage(page, profileData.activeUser)
       await page.goto(HOME_URL)
+
+      await page.waitForResponse(API_PROFILE)
+
+      await expect(page.getByText('Welcome to ChronoHub!')).not.toBeVisible()
+    })
+
+    test('does not show dialog when user already has a group', async ({ page }) => {
+      await setupAuthenticatedPage(page, profileData.userWithGroup)
+      await page.goto(HOME_URL)
+
+      await page.waitForResponse(API_PROFILE)
 
       await expect(page.getByText('Welcome to ChronoHub!')).not.toBeVisible()
     })
@@ -65,7 +52,7 @@ test.describe('Create group dialog', () => {
     test('dialog cannot be dismissed by clicking overlay', async ({ page }) => {
       await setupAuthenticatedPage(page, profileData.pendingUser)
       await page.goto(HOME_URL)
-
+      await page.waitForResponse(API_PROFILE)
       await expect(page.getByText('Welcome to ChronoHub!')).toBeVisible()
 
       await page
@@ -88,7 +75,7 @@ test.describe('Create group dialog', () => {
       await page.goto(HOME_URL)
 
       await expect(page.getByText('Welcome to ChronoHub!')).toBeVisible()
-      await expect(page.getByRole('button', { name: /close/i })).not.toBeVisible()
+      await expect(page.locator('[data-slot="dialog-header"]')).not.toBeVisible()
     })
   })
 
@@ -96,6 +83,7 @@ test.describe('Create group dialog', () => {
     test.beforeEach(async ({ page }) => {
       await setupAuthenticatedPage(page, profileData.pendingUser)
       await page.goto(HOME_URL)
+      await page.waitForResponse(API_PROFILE)
     })
 
     test('displays the app logo', async ({ page }) => {
@@ -131,7 +119,7 @@ test.describe('Create group dialog', () => {
     })
 
     test('shows error when name exceeds 50 characters', async ({ page }) => {
-      const longName = 'a'.repeat(51)
+      const longName = 'a'.repeat(52)
       await page.getByLabel(/name/i).fill(longName)
       await page.getByLabel(/description/i).click()
 
@@ -166,6 +154,7 @@ test.describe('Create group dialog', () => {
     test.beforeEach(async ({ page }) => {
       await setupAuthenticatedPage(page, profileData.pendingUser)
       await page.goto(HOME_URL)
+      await page.waitForResponse(API_PROFILE)
     })
 
     test('sends correct payload on successful submission', async ({ page }) => {
