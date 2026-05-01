@@ -60,7 +60,7 @@ export default function CreateGroupForm({
                   Name <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter group name" maxLength={50} {...field} />
+                  <Input placeholder="Enter group name" maxLength={52} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -76,7 +76,7 @@ export default function CreateGroupForm({
                 <FormControl>
                   <Textarea
                     placeholder="Enter group description (optional)"
-                    maxLength={250}
+                    maxLength={251}
                     rows={4}
                     {...field}
                   />
