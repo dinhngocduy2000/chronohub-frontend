@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import CreateGroupForm, {
   type CreateGroupFormHandle,
 } from '@/components/layouts/SiteHeader/create-group-dialog/create-group-dialog'
@@ -20,8 +20,7 @@ export function SiteHeader() {
   const { data: profileResponse } = useProfileQuery()
   const { data: groupKeyValueListData } = useListGroupKeyValueQuery({ params: null })
   const user = profileResponse?.data
-  const showCreateGroupDialog = profileResponse?.data?.status === UserStatus.PENDING
-  const [dialogOpen, setDialogOpen] = useState(showCreateGroupDialog)
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
   const formRef = useRef<CreateGroupFormHandle>(null)
   const isFormDirtyRef = useRef(false)
   const [formState, setFormState] = useState({ isValid: false, isPending: false, isDirty: false })
@@ -37,6 +36,18 @@ export function SiteHeader() {
   const listGroupKeyValue = useMemo(
     () => groupKeyValueListData?.data ?? [],
     [groupKeyValueListData?.data],
+  )
+
+  useEffect(
+    function openCreateGroupDialog() {
+      if (
+        profileResponse?.data?.status === UserStatus.PENDING ||
+        (profileResponse && !profileResponse?.data?.group_id)
+      ) {
+        setDialogOpen(true)
+      }
+    },
+    [profileResponse],
   )
 
   return (
@@ -63,7 +74,7 @@ export function SiteHeader() {
       </header>
 
       <AppDialogComponent
-        open={dialogOpen || showCreateGroupDialog}
+        open={dialogOpen}
         setOpen={setDialogOpen}
         dialogTrigger={null}
         header={false}

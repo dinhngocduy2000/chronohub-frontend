@@ -1,17 +1,17 @@
 import { ErrorMessage } from '@hookform/error-message'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileRoute, useLocation, useNavigate, useRouterState } from '@tanstack/react-router'
-import type { AxiosError } from 'axios'
-import { Activity, useEffect, useRef } from 'react'
+import { createFileRoute, useNavigate, useRouterState } from '@tanstack/react-router'
+import { Activity, useRef } from 'react'
 import { type Resolver, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { Field, FieldDescription, FieldGroup } from '@/components/ui/field'
+import { Field, FieldDescription } from '@/components/ui/field'
 import { Form, FormField } from '@/components/ui/form'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
-import { Spinner } from '@/components/ui/spinner'
+import { ROUTES } from '@/enum/routes'
 import type { IOTPFormType } from '@/interface/auth'
 import { getTranslations } from '@/lib/translation'
-import { useRegisterMutation } from '@/queries/use-auth-query'
+import { useValidateOTPMutation } from '@/queries/use-auth-query'
 import { otpSchemas } from '@/schemas/auth-schemas'
 export const Route = createFileRoute('/_guest/otp')({ component: OTPSignup })
 // Define the state type — add this to the route file
@@ -31,37 +31,39 @@ function OTPSignup() {
   const {
     control,
     handleSubmit,
-    watch,
     setError,
+    watch,
     formState: { errors },
   } = form
   const otpSlotsNumber = useRef<number>(6)
-  //   const {
-  //     data: _data,
-  //     isFetching: isRequestOTPPending,
-  //     refetch: refetchRequestOTP,
-  //     error,
-  //   } = useRequestOTPQuery({
-  //     params: {
-  //       email: item?.email ?? '',
-  //     },
-  //   })
-  //   const location = useLocation()
+  const { mutateAsync: validateOTPMutation, isPending: isValidateOTPPending } =
+    useValidateOTPMutation({
+      onSuccess: () => {
+        navigate({ to: ROUTES.HOME as string })
+        toast.success(translations.otp_verified_success())
+      },
+      onError: () => {
+        setError('otp', { message: translations.validation_otp_incorrect() })
+      },
+    })
 
-  //   useEffect(() => {
-  //     const axiosError = error as AxiosError<{ message?: string }> | undefined
-  //     const errorMessage = axiosError?.response?.data?.message
-  //     if (errorMessage) {
-  //       setError('otp', { message: errorMessage })
-  //     }
-  //   }, [error, setError])
-
+  const onSubmit = async (data: IOTPFormType) => {
+    if (!email) {
+      toast.error(translations.validation_email_required())
+      return
+    }
+    if (isValidateOTPPending) {
+      toast.error(translations.validation_otp_required())
+      return
+    }
+    await validateOTPMutation({
+      email: email ?? '',
+      otp: data.otp,
+    })
+  }
   return (
     <Form {...form}>
-      <form
-        //  onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <p className="text-center font-medium text-sm">
           {translations.sent_code_text()} <span className="block underline">{email}</span>
         </p>
@@ -70,14 +72,14 @@ function OTPSignup() {
           control={control}
           render={({ field }) => (
             <InputOTP
+              autoFocus
               maxLength={6}
-              //   disabled={isRegisterPending || isRequestOTPPending}
+              disabled={isValidateOTPPending}
               className="flex flex-col"
-              onComplete={
-                () => true
-                // onSubmit({
-                //   otp: watch('otp'),
-                // })
+              onComplete={() =>
+                onSubmit({
+                  otp: watch('otp'),
+                })
               }
               {...field}
               onChange={field.onChange}
@@ -103,7 +105,9 @@ function OTPSignup() {
               errors={errors}
               name="otp"
               render={({ message }) => {
-                return <p className="w-full text-center text-red-400 text-xs">{message}</p>
+                return (
+                  <p className="w-full text-center text-red-400 text-xs font-medium">{message}</p>
+                )
               }}
             />
           </div>
@@ -116,8 +120,8 @@ function OTPSignup() {
         </FieldDescription>
         <Field>
           <Button
-            // disabled={isRegisterPending || isRequestOTPPending}
-            // loading={isRegisterPending}
+            disabled={isValidateOTPPending}
+            loading={isValidateOTPPending}
             type="submit"
             className="h-12 gap-2 rounded-b-sm font-normal"
           >

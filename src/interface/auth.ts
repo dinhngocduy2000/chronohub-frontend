@@ -51,3 +51,8 @@ export type IRefreshTokenResponse = {
   accessToken: string
   refreshToken: string
 }
+
+export type IValidateOTPRequest = {
+  email: string
+  otp: string
+}

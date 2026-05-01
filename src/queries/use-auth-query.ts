@@ -7,12 +7,13 @@ import {
   logoutAPI,
   registerApi,
   trackSession,
+  validateOTPAPI,
 } from '@/api/auth'
 import { AUTH_ENDPOINTS } from '@/enum/endpoints'
 import { KEY_STORAGE } from '@/enum/key-storage'
 import { ROUTES } from '@/enum/routes'
 import type { IResponseData } from '@/interface/api-response'
-import type { ILoginRequest, IRegisterRequest } from '@/interface/auth'
+import type { ILoginRequest, IRegisterRequest, IValidateOTPRequest } from '@/interface/auth'
 import type { IMutation } from '@/interface/utils'
 
 export const GET_TRACK_SESSION_QUERY_KEY = [AUTH_ENDPOINTS.TRACK_SESSION]
@@ -113,6 +114,19 @@ export const useGetGoogleLoginURL = ({
       window.location.href = res.data.url
       onSuccess?.(res)
     },
+    onError,
+    onMutate,
+  })
+}
+
+export const useValidateOTPMutation = ({
+  onSuccess,
+  onError,
+  onMutate,
+}: IMutation<IResponseData<unknown>, IValidateOTPRequest> = {}) => {
+  return useMutation({
+    mutationFn: validateOTPAPI,
+    onSuccess,
     onError,
     onMutate,
   })

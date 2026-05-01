@@ -76,5 +76,6 @@
   "sent_code_text": "Chúng tôi đã gửi mã OTP đến",
   "didnt_get_code_text": "Không nhận được mã OTP?",
   "click_to_resend": "Nhấn để gửi lại",
-  "otp_button": "Xác nhận"
+  "otp_button": "Xác nhận",
+  "otp_verified_success": "Mã OTP đã được xác nhận thành công"
 }
