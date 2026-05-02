@@ -7,7 +7,7 @@ import type {
   createPasswordSchemas,
   createRegisterFormSchemas,
 } from '@/schemas/auth-schemas'
-import type { IGroupInfo } from './groups'
+import type { IOption } from './utils'
 
 export type IEmailFormType = z.infer<ReturnType<typeof createEmailSchemas>>
 export type IPasswordFormType = z.infer<ReturnType<typeof createPasswordSchemas>>
@@ -40,7 +40,7 @@ export type IUserProfileDetail = {
   updated_at: string
   image_url: string
   group_id?: string | null
-  owned_groups: IGroupInfo[]
+  group?: IOption | undefined
 }
 
 export type IRefreshTokenRequest = {

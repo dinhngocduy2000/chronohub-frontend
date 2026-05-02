@@ -55,9 +55,9 @@ type SingleProps = ComboboxSelectBaseProps & {
   /** When `false` or omitted, only a single option can be selected at a time. */
   multiple?: false
   /** The currently selected option, or `null` if nothing is selected. */
-  value: IOption | null
+  value: IOption | undefined
   /** Callback fired when the selected option changes. Receives the new option or `null`. */
-  onChange: (value: IOption | null) => void
+  onChange: (value: IOption | undefined) => void
 }
 
 type MultipleProps = ComboboxSelectBaseProps & {
@@ -111,12 +111,12 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
 
   const renderTriggerContent = () => {
     if (multiple && props.multiple) {
-      if (props.value.length === 0) {
+      if (props.value?.length === 0) {
         return <span className="text-muted-foreground">{placeholder}</span>
       }
       return (
         <div className="flex flex-wrap gap-1">
-          {props.value.map((v) => (
+          {props.value?.map((v) => (
             <span
               key={v.value}
               className="inline-flex items-center gap-1 rounded-sm bg-secondary px-1.5 py-0.5 text-xs font-medium text-secondary-foreground"
@@ -147,8 +147,8 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
     if (!props.multiple && props.value) {
       return (
         <span className="inline-flex items-center gap-2">
-          {props.value.icon && <span className="shrink-0">{props.value.icon}</span>}
-          {props.value.label}
+          {props.value?.icon && <span className="shrink-0">{props.value.icon}</span>}
+          {props.value?.label}
         </span>
       )
     }

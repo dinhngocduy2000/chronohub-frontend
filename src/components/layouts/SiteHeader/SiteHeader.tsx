@@ -24,7 +24,7 @@ export function SiteHeader() {
   const formRef = useRef<CreateGroupFormHandle>(null)
   const isFormDirtyRef = useRef(false)
   const [formState, setFormState] = useState({ isValid: false, isPending: false, isDirty: false })
-  const [selectedTeam, setSelectedTeam] = useState<IOption | null>(null)
+  const [selectedTeam, setSelectedTeam] = useState<IOption | undefined>(undefined)
   const [searchValue, setSearchValue] = useState('')
   const handleFormStateChange = useCallback(
     (state: { isValid: boolean; isPending: boolean; isDirty: boolean }) => {
@@ -62,7 +62,7 @@ export function SiteHeader() {
           options={listGroupKeyValue.filter((option) =>
             option.label.toLowerCase().includes(searchValue.toLowerCase()),
           )}
-          value={selectedTeam}
+          value={selectedTeam ?? user?.group}
           onChange={setSelectedTeam}
           placeholder="Select team..."
           className="w-48"
