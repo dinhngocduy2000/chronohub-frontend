@@ -17,6 +17,7 @@ export enum GROUPS_ENDPOINTS {
   CREATE = '/groups/create',
   LIST_KEY_VALUE = '/groups/key-value',
   LIST_GROUP = '/groups',
+  CHANGE_ACTIVE_GROUP = '/groups/switch',
 }
 
 export enum EVENTS_ENDPOINTS {

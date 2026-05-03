@@ -17,3 +17,10 @@ export const getListGroupKeyValue = async ({
 }): Promise<IResponseData<IOption[]>> => {
   return await axiosConfig.get(GROUPS_ENDPOINTS.LIST_KEY_VALUE, { signal })
 }
+
+export const changeActiveGroupAPI = async (
+  data: { group_id: string },
+  signal?: AbortSignal,
+): Promise<IResponseData<void>> => {
+  return await axiosConfig.put(GROUPS_ENDPOINTS.CHANGE_ACTIVE_GROUP, data, { signal })
+}

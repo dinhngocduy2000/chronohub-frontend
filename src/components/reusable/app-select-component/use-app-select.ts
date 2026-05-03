@@ -23,8 +23,8 @@ export function useAppSelect({
   isFetchingMore = false,
   onLoadMore,
 }: UseAppSelectParams) {
-  const [open, setOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [open, setOpen] = useState<boolean>(false)
+  const [searchTerm, setSearchTerm] = useState<string>('')
   const debouncedSearch = useDebounce(searchTerm, debounceMs)
   const listRef = useRef<HTMLDivElement>(null)
   const prevDebouncedRef = useRef(debouncedSearch)
@@ -33,7 +33,6 @@ export function useAppSelect({
     prevDebouncedRef.current = debouncedSearch
     onSearchChange?.(debouncedSearch)
   }
-
   const handleLoadMore = useCallback(() => {
     onLoadMore?.()
   }, [onLoadMore])

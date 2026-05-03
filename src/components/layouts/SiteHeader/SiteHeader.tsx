@@ -10,21 +10,23 @@ import { UserStatus } from '@/enum/users'
 import type { IOption } from '@/interface/utils'
 import { getTranslations } from '@/lib/translation'
 import { useProfileQuery, useTrackSessionQuery } from '@/queries/use-auth-query'
-import { useListGroupKeyValueQuery } from '@/queries/use-groups-query'
+import { useChangeActiveGroupMutation, useListGroupKeyValueQuery } from '@/queries/use-groups-query'
 import { ProfileDropdownComponent } from '../ProfileDropdownComponent'
 
 const t = getTranslations()
 
 export function SiteHeader() {
   useTrackSessionQuery()
-  const { data: profileResponse } = useProfileQuery()
-  const { data: groupKeyValueListData } = useListGroupKeyValueQuery({ params: null })
-  const user = profileResponse?.data
+  const [selectedTeam, setSelectedTeam] = useState<IOption | undefined>(undefined)
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+  const { data: profileResponse } = useProfileQuery()
+  const { data: groupKeyValueListData } = useListGroupKeyValueQuery({
+    params: null,
+  })
+  const user = profileResponse?.data
   const formRef = useRef<CreateGroupFormHandle>(null)
   const isFormDirtyRef = useRef(false)
   const [formState, setFormState] = useState({ isValid: false, isPending: false, isDirty: false })
-  const [selectedTeam, setSelectedTeam] = useState<IOption | undefined>(undefined)
   const [searchValue, setSearchValue] = useState('')
   const handleFormStateChange = useCallback(
     (state: { isValid: boolean; isPending: boolean; isDirty: boolean }) => {
@@ -33,9 +35,27 @@ export function SiteHeader() {
     },
     [],
   )
-  const listGroupKeyValue = useMemo(
-    () => groupKeyValueListData?.data ?? [],
-    [groupKeyValueListData?.data],
+
+  const handleSearchTeam = useCallback((value: string) => {
+    setSearchValue(value)
+  }, [])
+
+  const { mutateAsync: changeActiveGroup } = useChangeActiveGroupMutation({})
+
+  const handleChangeActiveGroup = async (group_id: string) => {
+    if (!group_id) return
+    if (group_id === user?.group_id) return
+    await changeActiveGroup({ group_id })
+  }
+  const listGroupKeyValueWithIcon = useMemo(
+    () =>
+      (groupKeyValueListData?.data ?? [])
+        .map((item) => ({
+          ...item,
+          icon: item.label,
+        }))
+        .filter((option) => option.label.toLowerCase().includes(searchValue.toLowerCase())),
+    [groupKeyValueListData?.data, searchValue],
   )
 
   useEffect(
@@ -50,6 +70,18 @@ export function SiteHeader() {
     [profileResponse],
   )
 
+  useEffect(
+    function setDefaultSelectedTeam() {
+      const defaultGroup = profileResponse?.data?.group
+      if (defaultGroup) {
+        setSelectedTeam({
+          ...defaultGroup,
+          icon: defaultGroup.label,
+        })
+      }
+    },
+    [profileResponse],
+  )
   return (
     <>
       <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background px-4">
@@ -59,15 +91,15 @@ export function SiteHeader() {
         <span className="text-lg font-semibold">{t.app_name()}</span>
 
         <AppSelectComponent
-          options={listGroupKeyValue.filter((option) =>
-            option.label.toLowerCase().includes(searchValue.toLowerCase()),
-          )}
-          value={selectedTeam ?? user?.group}
-          onChange={setSelectedTeam}
+          options={listGroupKeyValueWithIcon}
+          value={selectedTeam}
+          onChange={(value) => {
+            handleChangeActiveGroup(value?.value ?? '')
+          }}
           placeholder="Select team..."
           className="w-48"
           searchable
-          onSearchChange={(value) => setSearchValue(value)}
+          onSearchChange={handleSearchTeam}
         />
 
         <ProfileDropdownComponent user={user} />
