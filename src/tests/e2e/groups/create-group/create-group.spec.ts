@@ -1,9 +1,8 @@
 import { expect, test } from '@playwright/test'
-import { API_PROFILE, setupAuthenticatedPage } from '../utils/setup-authenticated'
-import groupData from './data/group.json' with { type: 'json' }
-import profileData from './data/profile.json' with { type: 'json' }
+import groupData from '../../data/group.json' with { type: 'json' }
+import profileData from '../../data/profile.json' with { type: 'json' }
+import { API_PROFILE, HOME_URL, setupAuthenticatedPage } from '../../utils/setup-authenticated'
 
-const HOME_URL = '/'
 const API_CREATE_GROUP = '**/api/v1/groups/create'
 const VALID_GROUP_NAME = 'My New Group'
 const VALID_DESCRIPTION = 'A group for organizing events'

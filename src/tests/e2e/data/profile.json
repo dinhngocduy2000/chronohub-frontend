@@ -9,7 +9,7 @@
       "updated_at": "2026-01-01T00:00:00.000Z",
       "image_url": "",
       "group_id": null,
-      "owned_groups": []
+      "group": null
     },
     "message": "Success",
     "statusCode": 200
@@ -23,7 +23,11 @@
       "created_at": "2026-01-01T00:00:00.000Z",
       "updated_at": "2026-01-01T00:00:00.000Z",
       "image_url": "",
-      "group_id": "660e8400-e29b-41d4-a716-446655440001"
+      "group_id": "660e8400-e29b-41d4-a716-446655440001",
+      "group": {
+        "label": "Test",
+        "value": "660e8400-e29b-41d4-a716-446655440001"
+      }
     },
     "message": "Success",
     "statusCode": 200
@@ -37,7 +41,11 @@
       "created_at": "2026-01-01T00:00:00.000Z",
       "updated_at": "2026-01-01T00:00:00.000Z",
       "image_url": "",
-      "group_id": "660e8400-e29b-41d4-a716-446655440001"
+      "group_id": "660e8400-e29b-41d4-a716-446655440001",
+      "group": {
+        "label": "Test",
+        "value": "660e8400-e29b-41d4-a716-446655440001"
+      }
     },
     "message": "Success",
     "statusCode": 200
@@ -51,7 +59,8 @@
       "created_at": "2026-01-01T00:00:00.000Z",
       "updated_at": "2026-01-01T00:00:00.000Z",
       "image_url": "",
-      "group_id": null
+      "group_id": null,
+      "group": null
     },
     "message": "Success",
     "statusCode": 200
