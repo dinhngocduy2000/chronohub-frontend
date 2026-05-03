@@ -2,6 +2,7 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "app_name": "ChronoHub",
   "welcome": "Welcome to ChronoHub",
+  "error_default": "Something went wrong. Please try again.",
   "footer_copyright": "All rights reserved.",
   "login_title": "Sign in to your account",
   "login_description": "Enter your credentials to continue",

@@ -9,15 +9,14 @@ import {
   trackSession,
   validateOTPAPI,
 } from '@/api/auth'
-import { AUTH_ENDPOINTS } from '@/enum/endpoints'
 import { KEY_STORAGE } from '@/enum/key-storage'
 import { ROUTES } from '@/enum/routes'
 import type { IResponseData } from '@/interface/api-response'
 import type { ILoginRequest, IRegisterRequest, IValidateOTPRequest } from '@/interface/auth'
 import type { IMutation } from '@/interface/utils'
+import { GET_PROFILE_QUERY_KEY, GET_TRACK_SESSION_QUERY_KEY } from './auth-query-keys'
 
-export const GET_TRACK_SESSION_QUERY_KEY = [AUTH_ENDPOINTS.TRACK_SESSION]
-export const GET_PROFILE_QUERY_KEY = [AUTH_ENDPOINTS.PROFILE]
+export { GET_PROFILE_QUERY_KEY, GET_TRACK_SESSION_QUERY_KEY } from './auth-query-keys'
 
 export const useLoginMutation = ({
   onSuccess,
@@ -70,7 +69,10 @@ export const useTrackSessionQuery = () => {
 export const useProfileQuery = () => {
   return useQuery({
     queryKey: GET_PROFILE_QUERY_KEY,
-    queryFn: ({ signal }) => getProfileApi(signal),
+    queryFn: async ({ signal }) => {
+      const res = await getProfileApi(signal)
+      return res
+    },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: true,
     retry: (num) => {

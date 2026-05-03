@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios'
 import type { ReactNode } from 'react'
 
 export type ReactQueryHookParams<T> = {
@@ -17,7 +18,7 @@ export type IOption = {
   label: string
   value: string
   subLabel?: string
-  icon?: React.ReactNode
+  icon?: React.ReactNode | string
 }
 
 export type IDropdownMenuProps = {
@@ -33,3 +34,7 @@ export type IDropdownMenuItem = {
   onClick: VoidFunction
   disabled?: boolean
 }
+
+export type IAxiosError = AxiosError<{
+  detail: string
+}>

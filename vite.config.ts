@@ -12,12 +12,17 @@ export default defineConfig({
   define: {
     'import.meta.env.VITE_CI': JSON.stringify(process.env.CI),
   },
+  // Pre-bundle React once so dev never loads two different module paths for `react`.
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react/jsx-runtime'],
+  },
   plugins: [
-    devtools(),
     tsconfigPaths({ projects: ['./tsconfig.json'] }),
-    tailwindcss(),
+    // TanStack Router must run before JSX/react-refresh (enforced by @tanstack/router-plugin).
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     viteReact(),
+    devtools(),
+    tailwindcss(),
     paraglideVitePlugin({
       project: './project.inlang',
       outdir: './src/paraglide',
@@ -51,7 +56,11 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
+    // One physical React instance in dev — avoids invalid hook call / “Should have a queue”
+    // when transitive deps resolve different `react` paths under pnpm.
+    dedupe: ['react', 'react-dom'],
   },
+
   test: {
     globals: true,
     environment: 'jsdom',

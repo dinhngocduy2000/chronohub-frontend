@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Spinner } from '@/components/ui/spinner'
 import type { IOption } from '@/interface/utils'
 import { cn } from '@/lib/utils'
-
+import InitialIcon from './initial-icon'
 import { useAppSelect } from './use-app-select'
 
 type ComboboxSelectBaseProps = {
@@ -121,7 +121,11 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
               key={v.value}
               className="inline-flex items-center gap-1 rounded-sm bg-secondary px-1.5 py-0.5 text-xs font-medium text-secondary-foreground"
             >
-              {v.icon && <span className="shrink-0">{v.icon}</span>}
+              {v.icon && typeof v.icon === 'string' ? (
+                <InitialIcon label={v.icon} />
+              ) : (
+                <span className="shrink-0">{v.icon}</span>
+              )}
               {v.label}
               {/* biome-ignore lint/a11y/useSemanticElements: <button> inside <Button> causes hydration errors */}
               <span
@@ -147,7 +151,11 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
     if (!props.multiple && props.value) {
       return (
         <span className="inline-flex items-center gap-2">
-          {props.value?.icon && <span className="shrink-0">{props.value.icon}</span>}
+          {props.value?.icon && typeof props.value.icon === 'string' ? (
+            <InitialIcon label={props.value.icon} />
+          ) : (
+            <span className="shrink-0">{props.value.icon}</span>
+          )}
           {props.value?.label}
         </span>
       )
@@ -206,7 +214,11 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
                       render(option, selected)
                     ) : (
                       <>
-                        {option.icon && <span className="shrink-0">{option.icon}</span>}
+                        {option.icon && typeof option.icon === 'string' ? (
+                          <InitialIcon label={option.icon} />
+                        ) : (
+                          <span className="shrink-0">{option.icon}</span>
+                        )}
                         <div className="flex flex-1 flex-col">
                           <span>{option.label}</span>
                           {option.subLabel && (
