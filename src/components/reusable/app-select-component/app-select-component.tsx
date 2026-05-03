@@ -150,14 +150,16 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
 
     if (!props.multiple && props.value) {
       return (
-        <span className="inline-flex items-center gap-2">
+        <div className="inline-flex items-center gap-2">
           {props.value?.icon && typeof props.value.icon === 'string' ? (
             <InitialIcon label={props.value.icon} />
           ) : (
             <span className="shrink-0">{props.value.icon}</span>
           )}
-          {props.value?.label}
-        </span>
+          <span id={props.value?.value} data-testid="selected-label">
+            {props.value?.label}
+          </span>
+        </div>
       )
     }
 
@@ -166,7 +168,7 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild disabled={disabled}>
+      <PopoverTrigger data-testid="select-trigger" asChild disabled={disabled}>
         <Button
           variant="outline"
           role="combobox"
@@ -190,6 +192,7 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
               <CommandPrimitive.Input
                 placeholder={searchPlaceholder}
                 value={searchTerm}
+                data-testid="select-search-input"
                 onValueChange={setSearchTerm}
                 className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground"
               />
@@ -204,6 +207,7 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
                   <CommandItem
                     key={option.value}
                     value={option.label}
+                    data-testid={`select-item-${option.value}`}
                     onSelect={() => handleSelect(option)}
                     className={cn(
                       'flex items-center gap-2',
@@ -220,7 +224,9 @@ export function AppSelectComponent(props: ComboboxSelectProps) {
                           <span className="shrink-0">{option.icon}</span>
                         )}
                         <div className="flex flex-1 flex-col">
-                          <span>{option.label}</span>
+                          <span data-testid={`select-item-label-${option.value}`}>
+                            {option.label}
+                          </span>
                           {option.subLabel && (
                             <span className="text-xs text-muted-foreground">{option.subLabel}</span>
                           )}

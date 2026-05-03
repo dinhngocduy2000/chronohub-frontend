@@ -3,6 +3,7 @@ export const API_PROFILE = '**/api/v1/auth/profile'
 export const API_TRACK_SESSION = '**/api/v1/auth/track'
 export const API_EVENTS = '**/api/v1/events**'
 export const API_KEY_VALUE_LIST = '**/api/v1/groups/key-value'
+export const HOME_URL = '/'
 
 export async function setupAuthenticatedPage(page: Page, profileResponse: unknown) {
   await page.addInitScript(() => {

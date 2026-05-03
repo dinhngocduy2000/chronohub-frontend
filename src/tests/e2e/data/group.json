@@ -18,5 +18,23 @@
   },
   "createGroupError": {
     "detail": "A group with this name already exists"
+  },
+  "listGroupKeyValue": {
+    "status": 200,
+    "message": "Success",
+    "data": [
+      {
+        "label": "Test",
+        "value": "660e8400-e29b-41d4-a716-446655440001"
+      },
+      {
+        "label": "Test 2",
+        "value": "660e8400-e29b-41d4-a716-446655440002"
+      },
+      {
+        "label": "Test 3",
+        "value": "660e8400-e29b-41d4-a716-446655440003"
+      }
+    ]
   }
 }
