@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
-import { getEventsCalendar } from '@/api/events'
 import { EVENTS_ENDPOINTS } from '@/enum/endpoints'
-import type { IEventCalendarRequest } from '@/interface/events'
+import { getEvents } from '@/generated/api/events/events'
+import type { ListCalendarEventsApiV1EventsGetParams } from '@/generated/types'
 
-export const getEventsCalendarQueryKey = (params: IEventCalendarRequest) =>
+export const getEventsCalendarQueryKey = (params: ListCalendarEventsApiV1EventsGetParams) =>
   [EVENTS_ENDPOINTS.EVENT_CALENDAR, params] as const
 
-export const useEventsCalendarQuery = (params: IEventCalendarRequest) => {
+export const useEventsCalendarQuery = (params: ListCalendarEventsApiV1EventsGetParams) => {
   return useQuery({
     queryKey: getEventsCalendarQueryKey(params),
-    queryFn: ({ signal }) => getEventsCalendar(params, signal),
+    queryFn: ({ signal }) => getEvents().listCalendarEventsApiV1EventsGet(params, signal),
     enabled: Boolean(params.group_id),
   })
 }

@@ -31,10 +31,11 @@ export const getGroups = () => {
    * List all groups with their IDs and names
    * @summary List all groups with their IDs and names
    */
-  const listGroupKeyValueApiV1GroupsKeyValueGet = () => {
+  const listGroupKeyValueApiV1GroupsKeyValueGet = (signal?: AbortSignal) => {
     return customInstance<BaseResponseListHashMapResponse>({
       url: `/api/v1/groups/key-value`,
       method: 'GET',
+      signal,
     })
   }
   /**
