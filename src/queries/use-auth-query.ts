@@ -1,18 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import {
-  getGoogleLoginURLAPI,
-  getProfileApi,
-  loginApi,
-  logoutAPI,
-  registerApi,
-  trackSession,
-  validateOTPAPI,
-} from '@/api/auth'
 import { KEY_STORAGE } from '@/enum/key-storage'
 import { ROUTES } from '@/enum/routes'
-import type { IResponseData } from '@/interface/api-response'
-import type { ILoginRequest, IRegisterRequest, IValidateOTPRequest } from '@/interface/auth'
+import { getAuth } from '@/generated/api/auth/auth'
+import type {
+  BaseResponseStr,
+  GoogleLoginResponse,
+  UserCreate,
+  UserLogin,
+  ValidateOTPRequest,
+} from '@/generated/types'
 import type { IMutation } from '@/interface/utils'
 import { GET_PROFILE_QUERY_KEY, GET_TRACK_SESSION_QUERY_KEY } from './auth-query-keys'
 
@@ -22,9 +19,9 @@ export const useLoginMutation = ({
   onSuccess,
   onError,
   onMutate,
-}: IMutation<string, ILoginRequest>) => {
+}: IMutation<string, UserLogin>) => {
   return useMutation({
-    mutationFn: loginApi,
+    mutationFn: getAuth().authenticateUserApiV1AuthLoginPost,
     onSuccess: (_, variables) => {
       localStorage.setItem(KEY_STORAGE.IS_LOGGED_IN, 'true')
       if (variables.is_save_session) {
@@ -41,9 +38,9 @@ export const useRegisterMutation = ({
   onSuccess,
   onError,
   onMutate,
-}: IMutation<unknown, IRegisterRequest> = {}) => {
+}: IMutation<unknown, UserCreate> = {}) => {
   return useMutation({
-    mutationFn: registerApi,
+    mutationFn: getAuth().registerUserApiV1AuthRegisterPost,
     onSuccess,
     onError,
     onMutate,
@@ -53,7 +50,7 @@ export const useRegisterMutation = ({
 export const useTrackSessionQuery = () => {
   return useQuery({
     queryKey: GET_TRACK_SESSION_QUERY_KEY,
-    queryFn: trackSession,
+    queryFn: getAuth().trackSessionApiV1AuthTrackGet,
     refetchInterval: () => 1000 * 60 * 10, // 10 min; stop when failed
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: false,
@@ -70,7 +67,7 @@ export const useProfileQuery = () => {
   return useQuery({
     queryKey: GET_PROFILE_QUERY_KEY,
     queryFn: async ({ signal }) => {
-      const res = await getProfileApi(signal)
+      const res = await getAuth().getCurrentUserProfileApiV1AuthProfileGet(signal)
       return res
     },
     staleTime: 1000 * 60 * 5,
@@ -92,7 +89,7 @@ export const useLogoutMutation = ({
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: logoutAPI,
+    mutationFn: getAuth().logoutApiV1AuthLogoutPost,
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: GET_PROFILE_QUERY_KEY })
       localStorage.removeItem(KEY_STORAGE.IS_LOGGED_IN)
@@ -109,9 +106,9 @@ export const useGetGoogleLoginURL = ({
   onSuccess,
   onError,
   onMutate,
-}: IMutation<IResponseData<{ url: string }>, unknown>) => {
+}: IMutation<GoogleLoginResponse, unknown>) => {
   return useMutation({
-    mutationFn: getGoogleLoginURLAPI,
+    mutationFn: getAuth().getGoogleAuthUrlApiV1AuthGooglePost,
     onSuccess: (res) => {
       window.location.href = res.data.url
       onSuccess?.(res)
@@ -125,9 +122,9 @@ export const useValidateOTPMutation = ({
   onSuccess,
   onError,
   onMutate,
-}: IMutation<IResponseData<unknown>, IValidateOTPRequest> = {}) => {
+}: IMutation<BaseResponseStr, ValidateOTPRequest> = {}) => {
   return useMutation({
-    mutationFn: validateOTPAPI,
+    mutationFn: getAuth().validateOtpApiV1AuthValidateOtpPost,
     onSuccess,
     onError,
     onMutate,
