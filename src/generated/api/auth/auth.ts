@@ -74,8 +74,12 @@ export const getAuth = () => {
    * Get current user profile based on the user id in the credential
    * @summary Get current user profile
    */
-  const getCurrentUserProfileApiV1AuthProfileGet = () => {
-    return customInstance<BaseResponseUserInfo>({ url: `/api/v1/auth/profile`, method: 'GET' })
+  const getCurrentUserProfileApiV1AuthProfileGet = (signal?: AbortSignal) => {
+    return customInstance<BaseResponseUserInfo>({
+      url: `/api/v1/auth/profile`,
+      method: 'GET',
+      signal,
+    })
   }
   /**
    * Track session based on the credential
