@@ -25,16 +25,13 @@ test.describe('Switch active group', () => {
     )
   })
   test('Show correct list of groups in the list of options', async ({ page }) => {
-    await page.waitForResponse(API_KEY_VALUE_LIST)
-    await page.waitForResponse(API_PROFILE)
-
     const triggerButton = page.getByTestId('select-trigger')
     await triggerButton.click()
     const listGroup = groupData.listGroupKeyValue.data
-    listGroup.forEach(async (group) => {
+    for (const group of listGroup) {
       await expect(page.getByTestId(`select-item-${group.value}`)).toBeVisible()
       await expect(page.getByTestId(`select-item-label-${group.value}`)).toHaveText(group.label)
-    })
+    }
   })
   test('The Selected group is highlighted in the list of options', async ({ page }) => {
     const triggerButton = page.getByTestId('select-trigger')
