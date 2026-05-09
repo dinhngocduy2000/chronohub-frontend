@@ -25,6 +25,8 @@ test.describe('Switch active group', () => {
     )
   })
   test('Show correct list of groups in the list of options', async ({ page }) => {
+    await page.waitForResponse(API_KEY_VALUE_LIST)
+
     const triggerButton = page.getByTestId('select-trigger')
     await triggerButton.click()
     const listGroup = groupData.listGroupKeyValue.data
