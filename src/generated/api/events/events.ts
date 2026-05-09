@@ -20,11 +20,15 @@ export const getEvents = () => {
    * List calendar events for a given month and year
    * @summary List calendar events
    */
-  const listCalendarEventsApiV1EventsGet = (params?: ListCalendarEventsApiV1EventsGetParams) => {
+  const listCalendarEventsApiV1EventsGet = (
+    params?: ListCalendarEventsApiV1EventsGetParams,
+    signal?: AbortSignal,
+  ) => {
     return customInstance<BaseResponseListEventCalendarView>({
       url: `/api/v1/events`,
       method: 'GET',
       params,
+      signal,
     })
   }
   /**

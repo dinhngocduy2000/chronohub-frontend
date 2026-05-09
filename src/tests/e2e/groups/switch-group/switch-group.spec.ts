@@ -28,11 +28,10 @@ test.describe('Switch active group', () => {
     const triggerButton = page.getByTestId('select-trigger')
     await triggerButton.click()
     const listGroup = groupData.listGroupKeyValue.data
-    listGroup.forEach(async (group) => {
-      console.log(group)
+    for (const group of listGroup) {
       await expect(page.getByTestId(`select-item-${group.value}`)).toBeVisible()
       await expect(page.getByTestId(`select-item-label-${group.value}`)).toHaveText(group.label)
-    })
+    }
   })
   test('The Selected group is highlighted in the list of options', async ({ page }) => {
     const triggerButton = page.getByTestId('select-trigger')
@@ -59,7 +58,6 @@ test.describe('Switch active group', () => {
   test('sends correct group_id on select', async ({ page }) => {
     let capturedBody: Record<string, unknown> | null = null
     await page.route(API_SWITCH_GROUP, async (route) => {
-      console.log(route.request())
       capturedBody = route.request().postDataJSON()
       await route.fulfill({
         status: 200,

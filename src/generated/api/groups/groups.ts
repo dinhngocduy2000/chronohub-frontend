@@ -31,10 +31,11 @@ export const getGroups = () => {
    * List all groups with their IDs and names
    * @summary List all groups with their IDs and names
    */
-  const listGroupKeyValueApiV1GroupsKeyValueGet = () => {
+  const listGroupKeyValueApiV1GroupsKeyValueGet = (signal?: AbortSignal) => {
     return customInstance<BaseResponseListHashMapResponse>({
       url: `/api/v1/groups/key-value`,
       method: 'GET',
+      signal,
     })
   }
   /**
@@ -47,10 +48,12 @@ export const getGroups = () => {
       method: 'GET',
     })
   }
+
   /**
    * Switch current user group based on the group id
    * @summary Switch current user group
    */
+
   const switchCurrentUserGroupApiV1GroupsSwitchPut = (switchGroupRequest: SwitchGroupRequest) => {
     return customInstance<string>({
       url: `/api/v1/groups/switch`,

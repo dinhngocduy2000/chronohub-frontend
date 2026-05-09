@@ -2,10 +2,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
 import { toast } from 'sonner'
-import { changeActiveGroupAPI, createGroupApi, getListGroupKeyValue } from '@/api/groups'
 import { GROUPS_ENDPOINTS } from '@/enum/endpoints'
+import { getGroups } from '@/generated/api/groups/groups'
+import type { GroupCreateDTO, GroupInfo, SwitchGroupRequest } from '@/generated/types'
 import type { IResponseData } from '@/interface/api-response'
-import type { ICreateGroupRequest, IGroupInfo } from '@/interface/groups'
 import type { IAxiosError, IMutation, ReactQueryHookParams } from '@/interface/utils'
 import { getErrorMessage } from '@/lib/utils'
 import { GET_PROFILE_QUERY_KEY } from './auth-query-keys'
@@ -18,10 +18,10 @@ export const useCreateGroupMutation = ({
   onSuccess,
   onError,
   onMutate,
-}: IMutation<IResponseData<IGroupInfo>, ICreateGroupRequest> = {}) => {
+}: IMutation<GroupInfo, GroupCreateDTO> = {}) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: createGroupApi,
+    mutationFn: getGroups().createGroupApiV1GroupsCreatePost,
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: GET_PROFILE_QUERY_KEY })
       onSuccess?.(data, variables)
@@ -39,7 +39,7 @@ export const useListGroupKeyValueQuery = ({
   return useQuery({
     queryKey: getListGroupKeyValueQueryKey(params, queryKey),
     queryFn: async ({ signal }) => {
-      const res = await getListGroupKeyValue({ signal })
+      const res = await getGroups().listGroupKeyValueApiV1GroupsKeyValueGet(signal)
       return res
     },
     enabled,
@@ -50,12 +50,12 @@ export const useChangeActiveGroupMutation = ({
   onSuccess,
   onError,
   onMutate,
-}: IMutation<IResponseData<void>, { group_id: string }>) => {
+}: IMutation<IResponseData<void>, SwitchGroupRequest>) => {
   const queryClient = useQueryClient()
   const toastID = useRef<string | number>(undefined)
   return useMutation({
-    mutationFn: async (data: { group_id: string }) => {
-      const res = await changeActiveGroupAPI(data)
+    mutationFn: async (data: SwitchGroupRequest) => {
+      const res = await getGroups().switchCurrentUserGroupApiV1GroupsSwitchPut(data)
       return res
     },
     onSuccess: () => {
