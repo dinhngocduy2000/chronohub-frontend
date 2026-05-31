@@ -3,6 +3,17 @@ description: Project overview, structure, and development workflow
 applyTo: "**/*"
 ---
 
+### Rule Enforcement
+You have access to detailed rules in `.cursor/rules/`.
+Before implementing anything non-trivial, check if a relevant rule exists.
+
+## If You Realize You've Gone Off Course
+1. Stop immediately — do not continue building on the wrong path
+2. State what rule you violated and which file it's in
+3. Propose the corrected approach before writing any code
+4. Wait for confirmation if the correction is non-trivial
+
+
 # ChronoHub Frontend — Project Overview
 
 You are working on the ChronoHub frontend, a modern single-page application for managing events through a calendar view, managing event details, and more.
