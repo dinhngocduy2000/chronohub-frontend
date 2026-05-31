@@ -9,9 +9,10 @@ import { customInstance } from '../../../api/custom-instance'
 import type {
   BaseResponseStr,
   BaseResponseUserInfo,
-  GoogleCallbackApiV1AuthGoogleCallbackGetParams,
-  GoogleLoginResponse,
+  GetSsoAuthUrlApiV1AuthSsoGetParams,
+  GoogleCallbackApiV1AuthSsoCallbackGetParams,
   RefreshTokenRequest,
+  SSOLoginResponse,
   UserCreate,
   UserLogin,
   ValidateOTPRequest,
@@ -31,20 +32,20 @@ export const getAuth = () => {
     })
   }
   /**
-   * Returns the Google OAuth authorization URL. Frontend should redirect the user to this URL to start sign-in. A state cookie is set for validation at the callback.
-   * @summary Get Google sign-in URL
+   * Returns the SSO OAuth authorization URL. Frontend should redirect the user to this URL to start sign-in. A state cookie is set for validation at the callback.
+   * @summary Get SSO sign-in URL
    */
-  const getGoogleAuthUrlApiV1AuthGooglePost = () => {
-    return customInstance<GoogleLoginResponse>({ url: `/api/v1/auth/google`, method: 'POST' })
+  const getSsoAuthUrlApiV1AuthSsoGet = (params: GetSsoAuthUrlApiV1AuthSsoGetParams) => {
+    return customInstance<SSOLoginResponse>({ url: `/api/v1/auth/sso`, method: 'GET', params })
   }
   /**
    * Called by Google after user signs in. Exchanges the code for tokens, creates session, redirects to the frontend URL.
-   * @summary Google OAuth callback
+   * @summary SSO OAuth callback
    */
-  const googleCallbackApiV1AuthGoogleCallbackGet = (
-    params: GoogleCallbackApiV1AuthGoogleCallbackGetParams,
+  const googleCallbackApiV1AuthSsoCallbackGet = (
+    params: GoogleCallbackApiV1AuthSsoCallbackGetParams,
   ) => {
-    return customInstance<unknown>({ url: `/api/v1/auth/google/callback`, method: 'GET', params })
+    return customInstance<unknown>({ url: `/api/v1/auth/sso/callback`, method: 'GET', params })
   }
   /**
    * Refresh a token.
@@ -78,7 +79,7 @@ export const getAuth = () => {
     return customInstance<BaseResponseUserInfo>({
       url: `/api/v1/auth/profile`,
       method: 'GET',
-      signal,
+      signal: signal,
     })
   }
   /**
@@ -109,8 +110,8 @@ export const getAuth = () => {
   }
   return {
     authenticateUserApiV1AuthLoginPost,
-    getGoogleAuthUrlApiV1AuthGooglePost,
-    googleCallbackApiV1AuthGoogleCallbackGet,
+    getSsoAuthUrlApiV1AuthSsoGet,
+    googleCallbackApiV1AuthSsoCallbackGet,
     refreshTokenApiV1AuthRefreshPost,
     registerUserApiV1AuthRegisterPost,
     getCurrentUserProfileApiV1AuthProfileGet,
@@ -122,11 +123,11 @@ export const getAuth = () => {
 export type AuthenticateUserApiV1AuthLoginPostResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getAuth>['authenticateUserApiV1AuthLoginPost']>>
 >
-export type GetGoogleAuthUrlApiV1AuthGooglePostResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getAuth>['getGoogleAuthUrlApiV1AuthGooglePost']>>
+export type GetSsoAuthUrlApiV1AuthSsoGetResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getAuth>['getSsoAuthUrlApiV1AuthSsoGet']>>
 >
-export type GoogleCallbackApiV1AuthGoogleCallbackGetResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof getAuth>['googleCallbackApiV1AuthGoogleCallbackGet']>>
+export type GoogleCallbackApiV1AuthSsoCallbackGetResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof getAuth>['googleCallbackApiV1AuthSsoCallbackGet']>>
 >
 export type RefreshTokenApiV1AuthRefreshPostResult = NonNullable<
   Awaited<ReturnType<ReturnType<typeof getAuth>['refreshTokenApiV1AuthRefreshPost']>>
