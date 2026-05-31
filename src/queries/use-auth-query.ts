@@ -5,7 +5,8 @@ import { ROUTES } from '@/enum/routes'
 import { getAuth } from '@/generated/api/auth/auth'
 import type {
   BaseResponseStr,
-  GoogleLoginResponse,
+  GetSsoAuthUrlApiV1AuthSsoGetParams,
+  SSOLoginResponse,
   UserCreate,
   UserLogin,
   ValidateOTPRequest,
@@ -106,9 +107,9 @@ export const useGetGoogleLoginURL = ({
   onSuccess,
   onError,
   onMutate,
-}: IMutation<GoogleLoginResponse, unknown>) => {
+}: IMutation<SSOLoginResponse, GetSsoAuthUrlApiV1AuthSsoGetParams>) => {
   return useMutation({
-    mutationFn: getAuth().getGoogleAuthUrlApiV1AuthGooglePost,
+    mutationFn: getAuth().getSsoAuthUrlApiV1AuthSsoGet,
     onSuccess: (res) => {
       window.location.href = res.data.url
       onSuccess?.(res)

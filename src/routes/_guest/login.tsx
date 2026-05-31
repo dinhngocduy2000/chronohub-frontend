@@ -18,6 +18,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { TypographyMuted, TypographyP } from '@/components/ui/typography'
 import { ROUTES } from '@/enum/routes'
+import { SsoProviders } from '@/generated/types'
 import type { ILoginFormType } from '@/interface/auth'
 import { getTranslations } from '@/lib/translation'
 import { useGetGoogleLoginURL, useLoginMutation } from '@/queries/use-auth-query'
@@ -164,7 +165,7 @@ function LoginPage() {
 
       <Button
         loading={isGettingGoogleLoginURL}
-        onClick={() => getGoogleLoginURL()}
+        onClick={() => getGoogleLoginURL({ provider: SsoProviders.google })}
         disabled={isGettingGoogleLoginURL}
         variant="outline"
         className="w-full"
