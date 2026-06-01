@@ -10,7 +10,6 @@ import type {
   BaseResponseStr,
   BaseResponseUserInfo,
   GetSsoAuthUrlApiV1AuthSsoGetParams,
-  GoogleCallbackApiV1AuthSsoCallbackGetParams,
   RefreshTokenRequest,
   SSOLoginResponse,
   UserCreate,
@@ -42,10 +41,8 @@ export const getAuth = () => {
    * Called by Google after user signs in. Exchanges the code for tokens, creates session, redirects to the frontend URL.
    * @summary SSO OAuth callback
    */
-  const googleCallbackApiV1AuthSsoCallbackGet = (
-    params: GoogleCallbackApiV1AuthSsoCallbackGetParams,
-  ) => {
-    return customInstance<unknown>({ url: `/api/v1/auth/sso/callback`, method: 'GET', params })
+  const googleCallbackApiV1AuthSsoCallbackGet = () => {
+    return customInstance<unknown>({ url: `/api/v1/auth/sso/callback`, method: 'GET' })
   }
   /**
    * Refresh a token.
@@ -79,7 +76,7 @@ export const getAuth = () => {
     return customInstance<BaseResponseUserInfo>({
       url: `/api/v1/auth/profile`,
       method: 'GET',
-      signal: signal,
+      signal,
     })
   }
   /**

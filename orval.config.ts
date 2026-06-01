@@ -10,6 +10,7 @@ export default defineConfig({
       target: './src/generated/api',
       schemas: './src/generated/types',
       client: 'axios',
+      formatter: 'biome',
       override: {
         mutator: {
           path: './src/api/custom-instance.ts',
