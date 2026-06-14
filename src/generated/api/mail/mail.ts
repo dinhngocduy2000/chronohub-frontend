@@ -8,13 +8,17 @@
 import { customInstance } from '../../../api/custom-instance'
 import type { SendMailResponse } from '../../types'
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
 export const getMail = () => {
   /**
    * Send an email to one or more recipients. Requires authentication.
    * @summary Send an email
    */
-  const sendEmailApiV1MailSendPost = () => {
-    return customInstance<SendMailResponse>({ url: `/api/v1/mail/send`, method: 'POST' })
+  const sendEmailApiV1MailSendPost = (
+    options?: SecondParameter<typeof customInstance<SendMailResponse>>,
+  ) => {
+    return customInstance<SendMailResponse>({ url: `/api/v1/mail/send`, method: 'POST' }, options)
   }
   return { sendEmailApiV1MailSendPost }
 }

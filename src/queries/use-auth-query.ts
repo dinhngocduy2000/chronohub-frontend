@@ -22,7 +22,7 @@ export const useLoginMutation = ({
   onMutate,
 }: IMutation<string, UserLogin>) => {
   return useMutation({
-    mutationFn: getAuth().authenticateUserApiV1AuthLoginPost,
+    mutationFn: (data: UserLogin) => getAuth().authenticateUserApiV1AuthLoginPost(data),
     onSuccess: (_, variables) => {
       localStorage.setItem(KEY_STORAGE.IS_LOGGED_IN, 'true')
       if (variables.is_save_session) {
@@ -41,7 +41,7 @@ export const useRegisterMutation = ({
   onMutate,
 }: IMutation<unknown, UserCreate> = {}) => {
   return useMutation({
-    mutationFn: getAuth().registerUserApiV1AuthRegisterPost,
+    mutationFn: (data: UserCreate) => getAuth().registerUserApiV1AuthRegisterPost(data),
     onSuccess,
     onError,
     onMutate,
@@ -51,7 +51,7 @@ export const useRegisterMutation = ({
 export const useTrackSessionQuery = () => {
   return useQuery({
     queryKey: GET_TRACK_SESSION_QUERY_KEY,
-    queryFn: getAuth().trackSessionApiV1AuthTrackGet,
+    queryFn: ({ signal }) => getAuth().trackSessionApiV1AuthTrackGet(signal),
     refetchInterval: () => 1000 * 60 * 10, // 10 min; stop when failed
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: false,
@@ -109,7 +109,8 @@ export const useGetGoogleLoginURL = ({
   onMutate,
 }: IMutation<SSOLoginResponse, GetSsoAuthUrlApiV1AuthSsoGetParams>) => {
   return useMutation({
-    mutationFn: getAuth().getSsoAuthUrlApiV1AuthSsoGet,
+    mutationFn: (payload: GetSsoAuthUrlApiV1AuthSsoGetParams) =>
+      getAuth().getSsoAuthUrlApiV1AuthSsoGet(payload),
     onSuccess: (res) => {
       window.location.href = res.data.url
       onSuccess?.(res)
@@ -123,9 +124,10 @@ export const useValidateOTPMutation = ({
   onSuccess,
   onError,
   onMutate,
-}: IMutation<BaseResponseStr, ValidateOTPRequest> = {}) => {
+}: IMutation<BaseResponseStr, ValidateOTPRequest>) => {
   return useMutation({
-    mutationFn: getAuth().validateOtpApiV1AuthValidateOtpPost,
+    mutationFn: (payload: ValidateOTPRequest) =>
+      getAuth().validateOtpApiV1AuthValidateOtpPost(payload as ValidateOTPRequest),
     onSuccess,
     onError,
     onMutate,

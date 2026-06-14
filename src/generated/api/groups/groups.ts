@@ -14,50 +14,69 @@ import type {
   SwitchGroupRequest,
 } from '../../types'
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
 export const getGroups = () => {
   /**
    * Create a new group with name, description, and members
    * @summary Create a new group
    */
-  const createGroupApiV1GroupsCreatePost = (groupCreateDTO: GroupCreateDTO) => {
-    return customInstance<GroupInfo>({
-      url: `/api/v1/groups/create`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: groupCreateDTO,
-    })
+  const createGroupApiV1GroupsCreatePost = (
+    groupCreateDTO: GroupCreateDTO,
+    options?: SecondParameter<typeof customInstance<GroupInfo>>,
+  ) => {
+    return customInstance<GroupInfo>(
+      {
+        url: `/api/v1/groups/create`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: groupCreateDTO,
+      },
+      options,
+    )
   }
   /**
    * List all groups with their IDs and names
    * @summary List all groups with their IDs and names
    */
-  const listGroupKeyValueApiV1GroupsKeyValueGet = () => {
-    return customInstance<BaseResponseListHashMapResponse>({
-      url: `/api/v1/groups/key-value`,
-      method: 'GET',
-    })
+  const listGroupKeyValueApiV1GroupsKeyValueGet = (
+    options?: SecondParameter<typeof customInstance<BaseResponseListHashMapResponse>>,
+  ) => {
+    return customInstance<BaseResponseListHashMapResponse>(
+      { url: `/api/v1/groups/key-value`, method: 'GET' },
+      options,
+    )
   }
   /**
    * Get a group by its ID
    * @summary Get a group by its ID
    */
-  const getGroupApiV1GroupsGroupIdGet = (groupId: string) => {
-    return customInstance<BaseResponseGroupInfo>({
-      url: `/api/v1/groups/${groupId}`,
-      method: 'GET',
-    })
+  const getGroupApiV1GroupsGroupIdGet = (
+    groupId: string,
+    options?: SecondParameter<typeof customInstance<BaseResponseGroupInfo>>,
+  ) => {
+    return customInstance<BaseResponseGroupInfo>(
+      { url: `/api/v1/groups/${groupId}`, method: 'GET' },
+      options,
+    )
   }
   /**
    * Switch current user group based on the group id
    * @summary Switch current user group
    */
-  const switchCurrentUserGroupApiV1GroupsSwitchPut = (switchGroupRequest: SwitchGroupRequest) => {
-    return customInstance<string>({
-      url: `/api/v1/groups/switch`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: switchGroupRequest,
-    })
+  const switchCurrentUserGroupApiV1GroupsSwitchPut = (
+    switchGroupRequest: SwitchGroupRequest,
+    options?: SecondParameter<typeof customInstance<string>>,
+  ) => {
+    return customInstance<string>(
+      {
+        url: `/api/v1/groups/switch`,
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        data: switchGroupRequest,
+      },
+      options,
+    )
   }
   return {
     createGroupApiV1GroupsCreatePost,
