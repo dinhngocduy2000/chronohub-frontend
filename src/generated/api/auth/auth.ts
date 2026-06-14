@@ -17,93 +17,130 @@ import type {
   ValidateOTPRequest,
 } from '../../types'
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
 export const getAuth = () => {
   /**
    * Login a user with email and password.
    * @summary Login a user
    */
-  const authenticateUserApiV1AuthLoginPost = (userLogin: UserLogin) => {
-    return customInstance<string>({
-      url: `/api/v1/auth/login`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: userLogin,
-    })
+  const authenticateUserApiV1AuthLoginPost = (
+    userLogin: UserLogin,
+    options?: SecondParameter<typeof customInstance<string>>,
+  ) => {
+    return customInstance<string>(
+      {
+        url: `/api/v1/auth/login`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: userLogin,
+      },
+      options,
+    )
   }
   /**
    * Returns the SSO OAuth authorization URL. Frontend should redirect the user to this URL to start sign-in. A state cookie is set for validation at the callback.
    * @summary Get SSO sign-in URL
    */
-  const getSsoAuthUrlApiV1AuthSsoGet = (params: GetSsoAuthUrlApiV1AuthSsoGetParams) => {
-    return customInstance<SSOLoginResponse>({ url: `/api/v1/auth/sso`, method: 'GET', params })
+  const getSsoAuthUrlApiV1AuthSsoGet = (
+    params: GetSsoAuthUrlApiV1AuthSsoGetParams,
+    options?: SecondParameter<typeof customInstance<SSOLoginResponse>>,
+  ) => {
+    return customInstance<SSOLoginResponse>(
+      { url: `/api/v1/auth/sso`, method: 'GET', params },
+      options,
+    )
   }
   /**
    * Called by Google after user signs in. Exchanges the code for tokens, creates session, redirects to the frontend URL.
    * @summary SSO OAuth callback
    */
-  const googleCallbackApiV1AuthSsoCallbackGet = () => {
-    return customInstance<unknown>({ url: `/api/v1/auth/sso/callback`, method: 'GET' })
+  const googleCallbackApiV1AuthSsoCallbackGet = (
+    options?: SecondParameter<typeof customInstance<unknown>>,
+  ) => {
+    return customInstance<unknown>({ url: `/api/v1/auth/sso/callback`, method: 'GET' }, options)
   }
   /**
    * Refresh a token.
    * @summary Refresh a token
    */
-  const refreshTokenApiV1AuthRefreshPost = (refreshTokenRequest: RefreshTokenRequest) => {
-    return customInstance<string>({
-      url: `/api/v1/auth/refresh`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: refreshTokenRequest,
-    })
+  const refreshTokenApiV1AuthRefreshPost = (
+    refreshTokenRequest: RefreshTokenRequest,
+    options?: SecondParameter<typeof customInstance<string>>,
+  ) => {
+    return customInstance<string>(
+      {
+        url: `/api/v1/auth/refresh`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: refreshTokenRequest,
+      },
+      options,
+    )
   }
   /**
    * Create a new user account with email, name, and password. Password must be at least 8 characters with uppercase, lowercase, number, and special character.
    * @summary Create a new user
    */
-  const registerUserApiV1AuthRegisterPost = (userCreate: UserCreate) => {
-    return customInstance<string>({
-      url: `/api/v1/auth/register`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: userCreate,
-    })
+  const registerUserApiV1AuthRegisterPost = (
+    userCreate: UserCreate,
+    options?: SecondParameter<typeof customInstance<string>>,
+  ) => {
+    return customInstance<string>(
+      {
+        url: `/api/v1/auth/register`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: userCreate,
+      },
+      options,
+    )
   }
   /**
    * Get current user profile based on the user id in the credential
    * @summary Get current user profile
    */
-  const getCurrentUserProfileApiV1AuthProfileGet = (signal?: AbortSignal) => {
-    return customInstance<BaseResponseUserInfo>({
-      url: `/api/v1/auth/profile`,
-      method: 'GET',
-      signal,
-    })
+  const getCurrentUserProfileApiV1AuthProfileGet = (
+    options?: SecondParameter<typeof customInstance<BaseResponseUserInfo>>,
+  ) => {
+    return customInstance<BaseResponseUserInfo>(
+      { url: `/api/v1/auth/profile`, method: 'GET' },
+      options,
+    )
   }
   /**
    * Track session based on the credential
    * @summary Track session
    */
-  const trackSessionApiV1AuthTrackGet = () => {
-    return customInstance<string>({ url: `/api/v1/auth/track`, method: 'GET' })
+  const trackSessionApiV1AuthTrackGet = (
+    options?: SecondParameter<typeof customInstance<string>>,
+  ) => {
+    return customInstance<string>({ url: `/api/v1/auth/track`, method: 'GET' }, options)
   }
   /**
    * Logout a user
    * @summary Logout a user
    */
-  const logoutApiV1AuthLogoutPost = () => {
-    return customInstance<string>({ url: `/api/v1/auth/logout`, method: 'POST' })
+  const logoutApiV1AuthLogoutPost = (options?: SecondParameter<typeof customInstance<string>>) => {
+    return customInstance<string>({ url: `/api/v1/auth/logout`, method: 'POST' }, options)
   }
   /**
    * Validate OTP based on the OTP and email
    * @summary Validate OTP
    */
-  const validateOtpApiV1AuthValidateOtpPost = (validateOTPRequest: ValidateOTPRequest) => {
-    return customInstance<BaseResponseStr>({
-      url: `/api/v1/auth/validate-otp`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: validateOTPRequest,
-    })
+  const validateOtpApiV1AuthValidateOtpPost = (
+    validateOTPRequest: ValidateOTPRequest,
+    options?: SecondParameter<typeof customInstance<BaseResponseStr>>,
+  ) => {
+    return customInstance<BaseResponseStr>(
+      {
+        url: `/api/v1/auth/validate-otp`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: validateOTPRequest,
+      },
+      options,
+    )
   }
   return {
     authenticateUserApiV1AuthLoginPost,

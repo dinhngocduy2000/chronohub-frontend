@@ -15,58 +15,81 @@ import type {
   ListCalendarEventsApiV1EventsGetParams,
 } from '../../types'
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
+
 export const getEvents = () => {
   /**
    * List calendar events for a given month and year
    * @summary List calendar events
    */
-  const listCalendarEventsApiV1EventsGet = (params?: ListCalendarEventsApiV1EventsGetParams) => {
-    return customInstance<BaseResponseListEventCalendarView>({
-      url: `/api/v1/events`,
-      method: 'GET',
-      params,
-    })
+  const listCalendarEventsApiV1EventsGet = (
+    params?: ListCalendarEventsApiV1EventsGetParams,
+    options?: SecondParameter<typeof customInstance<BaseResponseListEventCalendarView>>,
+  ) => {
+    return customInstance<BaseResponseListEventCalendarView>(
+      { url: `/api/v1/events`, method: 'GET', params },
+      options,
+    )
   }
   /**
    * Create a new event with name, description, and members
    * @summary Create a new event
    */
-  const createEventApiV1EventsPost = (eventCreate: EventCreate) => {
-    return customInstance<EventDetailInfo>({
-      url: `/api/v1/events`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: eventCreate,
-    })
+  const createEventApiV1EventsPost = (
+    eventCreate: EventCreate,
+    options?: SecondParameter<typeof customInstance<EventDetailInfo>>,
+  ) => {
+    return customInstance<EventDetailInfo>(
+      {
+        url: `/api/v1/events`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: eventCreate,
+      },
+      options,
+    )
   }
   /**
    * Get event detail by id
    * @summary Get event detail
    */
-  const getEventDetailApiV1EventsIdGet = (id: string) => {
-    return customInstance<BaseResponseEventDetailInfo>({
-      url: `/api/v1/events/${id}`,
-      method: 'GET',
-    })
+  const getEventDetailApiV1EventsIdGet = (
+    id: string,
+    options?: SecondParameter<typeof customInstance<BaseResponseEventDetailInfo>>,
+  ) => {
+    return customInstance<BaseResponseEventDetailInfo>(
+      { url: `/api/v1/events/${id}`, method: 'GET' },
+      options,
+    )
   }
   /**
    * Delete an event by id
    * @summary Delete an event
    */
-  const deleteEventApiV1EventsIdDelete = (id: string) => {
-    return customInstance<void>({ url: `/api/v1/events/${id}`, method: 'DELETE' })
+  const deleteEventApiV1EventsIdDelete = (
+    id: string,
+    options?: SecondParameter<typeof customInstance<void>>,
+  ) => {
+    return customInstance<void>({ url: `/api/v1/events/${id}`, method: 'DELETE' }, options)
   }
   /**
    * Update an event by id
    * @summary Update an event
    */
-  const updateEventApiV1EventsIdPut = (id: string, eventUpdate: EventUpdate) => {
-    return customInstance<string>({
-      url: `/api/v1/events/${id}`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: eventUpdate,
-    })
+  const updateEventApiV1EventsIdPut = (
+    id: string,
+    eventUpdate: EventUpdate,
+    options?: SecondParameter<typeof customInstance<string>>,
+  ) => {
+    return customInstance<string>(
+      {
+        url: `/api/v1/events/${id}`,
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        data: eventUpdate,
+      },
+      options,
+    )
   }
   return {
     listCalendarEventsApiV1EventsGet,

@@ -21,7 +21,9 @@ export const useCreateGroupMutation = ({
 }: IMutation<GroupInfo, GroupCreateDTO> = {}) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: getGroups().createGroupApiV1GroupsCreatePost,
+    mutationFn: async (data: GroupCreateDTO) => {
+      return await getGroups().createGroupApiV1GroupsCreatePost(data)
+    },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: GET_PROFILE_QUERY_KEY })
       onSuccess?.(data, variables)
