@@ -1,14 +1,18 @@
-# GitHub Copilot Skill: Automated Pull Request Creation
+---
+applyTo: "**"
+---
+
+# GitHub Copilot Instructions: Automated Pull Request Creation
 
 ## Overview
 
-This skill enables GitHub Copilot to automatically create pull requests using the GitHub CLI (`gh`), enforcing the repository's PR description template and accepting a user-specified target branch.
+These instructions enable GitHub Copilot to automatically create pull requests using the GitHub CLI (`gh`), enforcing the repository's PR description template and accepting a user-specified target branch.
 
 ---
 
 ## Trigger Conditions
 
-Activate this skill when the user requests any of the following:
+Activate these instructions when the user requests any of the following:
 
 - "Create a PR", "Open a pull request", "Submit a PR"
 - "Push and create PR to `<branch>`"
@@ -33,7 +37,7 @@ If any check fails, surface a clear error to the user before proceeding.
 
 ---
 
-## Skill Behavior
+## Behavior
 
 ### 1. Resolve Target Branch
 
@@ -125,11 +129,12 @@ After successful creation:
 
 - **Never modify the PR template file** — treat it as read-only.
 - **Never default the target branch** without explicit user confirmation.
-- **Never push commits** — this skill only creates the PR. Branch pushing is the user's responsibility unless explicitly requested.
+- **Never push commits** — these instructions only cover PR creation. Branch pushing is the user's responsibility unless explicitly requested.
 - Do not add or remove template sections — populate only.
 
 ---
 
-## Related Prompts
+## Related Files
 
-- See [`create-pr.prompt.md`](./create-pr.prompt.md) for the prompt used to generate PR body content.
+- Prompt: [`.github/prompts/create-pr.prompt.md`](../../prompts/create-pr.prompt.md)
+- PR Template: [`.github/PULL_REQUEST_TEMPLATE.md`](../../PULL_REQUEST_TEMPLATE.md)
